@@ -109,4 +109,13 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Sidebar hover expansion */
+  [data-sidebar="sidebar"]:hover {
+    width: 14rem !important;
+  }
+  
+  [data-sidebar="sidebar"]:not(:hover) {
+    width: 5rem !important;
+  }
 }
