@@ -57,7 +57,7 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate }: BlogPostList
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (
-            <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+            <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow z-10 relative">
               {post.coverImage && (
                 <div className="aspect-video w-full overflow-hidden bg-muted">
                   <img
