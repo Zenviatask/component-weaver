@@ -35,7 +35,7 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate }: BlogPostList
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 relative z-10">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-foreground">Posts do Blog</h2>
         <Button onClick={onCreate} className="gap-2">
@@ -45,7 +45,7 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate }: BlogPostList
       </div>
 
       {posts.length === 0 ? (
-        <Card>
+        <Card className="relative z-10">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <p className="text-muted-foreground mb-4">Nenhum post criado ainda</p>
             <Button onClick={onCreate} variant="outline" className="gap-2">

@@ -63,7 +63,7 @@ export const BlogPostForm = ({ post, onSubmit, onCancel }: BlogPostFormProps) =>
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative z-10">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={onCancel}>
           <ArrowLeft className="h-5 w-5" />
@@ -75,7 +75,7 @@ export const BlogPostForm = ({ post, onSubmit, onCancel }: BlogPostFormProps) =>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <Card>
+          <Card className="relative z-10">
             <CardHeader>
               <CardTitle>Informações do Post</CardTitle>
             </CardHeader>
