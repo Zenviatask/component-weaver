@@ -8,7 +8,7 @@ interface DashboardLayoutProps {
 
 export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   return (
-    <div className="relative min-h-screen w-full bg-slate-200">
+    <div className="relative min-h-screen w-full bg-muted/30">
       <DashboardHeader />
       <DashboardSidebar />
       

@@ -1,10 +1,11 @@
 import { Bell, ChevronDown, Globe, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DomainDropdown from "@/components/DomainDropdown";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const DashboardHeader = () => {
   return (
-    <header className="fixed left-0 right-0 top-0 z-50 flex h-16 items-center justify-between bg-white px-6 shadow-sm">
+    <header className="fixed left-0 right-0 top-0 z-50 flex h-16 items-center justify-between bg-background border-b border-border px-6 shadow-sm">
       <div className="flex items-center gap-3">
         {/* Use caminho absoluto para imagens em public */}
         <img src="/LEVANTA-01.svg" alt="Levantec Logo" className="h-8 w-auto align-middle" draggable={false} style={{ display: "block" }} />
@@ -14,9 +15,11 @@ export const DashboardHeader = () => {
           <DomainDropdown />
         </div>
 
-        <div className="h-8 w-px bg-gray-200" />
+        <div className="h-8 w-px bg-border" />
 
-        <Button variant="ghost" size="icon" className="relative h-9 w-9 text-gray-400 hover:text-slate-800">
+        <ThemeToggle />
+
+        <Button variant="ghost" size="icon" className="relative h-9 w-9 text-muted-foreground hover:text-foreground">
           <Bell className="h-5 w-5" />
           <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500" />
         </Button>
