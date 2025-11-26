@@ -18,7 +18,7 @@ export const PagesGallery = () => {
         </Button>
       </div>
       
-      <div className="p-6">
+      <div className="p-6 pt-5 pb-3">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           {pages.map((page, index) => (
             <div key={index} className="group cursor-pointer">
@@ -36,6 +36,21 @@ export const PagesGallery = () => {
             </div>
           ))}
         </div>
+
+        {/* Botão de adicionar páginas */}
+        <div className="mt-6 flex">
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full h-12 rounded-xl text-white font-medium border-0 hover:bg-blue-100 transition-colors"
+            style={{
+              background: "linear-gradient(90deg, #3363ccff 0%, #2b59ecff 100%)"
+            }}
+          >
+            + Adicionar páginas
+          </Button>
+        </div>
+
       </div>
     </div>
   );

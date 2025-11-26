@@ -2,7 +2,7 @@ import { Globe, Rocket, MessageSquare, Activity } from "lucide-react";
 import { DashboardLayout } from "./DashboardLayout";
 import { StatCard } from "./StatCard";
 import { TrafficChart } from "./TrafficChart";
-import { WidgetsGrid } from "./WidgetsGrid";
+import WidgetsGrid from './WidgetsGrid';
 import { FunctionalityButtons } from "./FunctionalityButtons";
 import { SitesList } from "./SitesList";
 import { PagesGallery } from "./PagesGallery";
@@ -10,9 +10,9 @@ import { PagesGallery } from "./PagesGallery";
 export const ContentDashboard = () => {
   return (
     <DashboardLayout>
-      <div className="p-4 lg:p-6">
+      <div className="p-4 lg:p-6 relative z-10">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/*<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             title="Sites Ativos"
             value="2"
@@ -45,7 +45,7 @@ export const ContentDashboard = () => {
             iconBgColor="bg-orange-50"
             iconColor="text-orange-500"
           />
-        </div>
+        </div>*/}
 
         {/* Main Content Grid */}
         <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">

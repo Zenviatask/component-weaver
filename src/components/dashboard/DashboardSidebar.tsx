@@ -5,7 +5,7 @@ import { useLocation } from "react-router-dom";
 const navItems = [
   { title: "Dashboard", icon: LayoutDashboard, url: "/" },
   { title: "Sites", icon: Globe, url: "/sites" },
-  { title: "Páginas", icon: FileText, url: "/pages" },
+  { title: "Blog", icon: FileText, url: "/pages" },
   { title: "Widgets", icon: Sparkles, url: "/widgets" },
   { title: "Templates", icon: LayoutTemplate, url: "/templates" },
   { title: "Configurações", icon: Settings, url: "/settings" },
@@ -16,7 +16,7 @@ export const DashboardSidebar = () => {
   const location = useLocation();
 
   return (
-    <aside className="group fixed bottom-4 left-4 top-20 z-40 w-20 rounded-2xl bg-slate-800 transition-all duration-300 hover:w-56">
+    <aside className="group fixed bottom-4 left-4 top-20 z-40 w-[67px] rounded-2xl bg-slate-800 transition-all duration-300 hover:w-56">
       <nav className="mt-2 p-3">
         {navItems.map((item, index) => {
           const isActive = location.pathname === item.url;
