@@ -1,7 +1,9 @@
-import { useState } from "react";
-import { Pencil, Trash2, Plus, Eye } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Pencil, Trash2, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import blogPlaceholder from "@/assets/blog-placeholder.jpg";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,18 +35,41 @@ interface BlogPostListProps {
 
 export const BlogPostList = ({ posts, onEdit, onDelete, onCreate }: BlogPostListProps) => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredPosts = useMemo(() => {
+    if (!searchQuery.trim()) return posts;
+    
+    const query = searchQuery.toLowerCase();
+    return posts.filter(post => 
+      post.title.toLowerCase().includes(query) ||
+      post.excerpt.toLowerCase().includes(query) ||
+      post.content.toLowerCase().includes(query)
+    );
+  }, [posts, searchQuery]);
 
   return (
     <div className="space-y-4 relative z-10">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <h2 className="text-2xl font-bold text-foreground">Posts do Blog</h2>
-        <Button onClick={onCreate} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Novo Post
-        </Button>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="relative flex-1 sm:w-64">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Buscar posts..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          <Button onClick={onCreate} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Novo Post
+          </Button>
+        </div>
       </div>
 
-      {posts.length === 0 ? (
+      {filteredPosts.length === 0 && posts.length === 0 ? (
         <Card className="relative z-10">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <p className="text-muted-foreground mb-4">Nenhum post criado ainda</p>
@@ -54,19 +79,23 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate }: BlogPostList
             </Button>
           </CardContent>
         </Card>
+      ) : filteredPosts.length === 0 ? (
+        <Card className="relative z-10">
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <p className="text-muted-foreground">Nenhum post encontrado com "{searchQuery}"</p>
+          </CardContent>
+        </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post) => (
+          {filteredPosts.map((post) => (
             <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow z-10 relative">
-              {post.coverImage && (
-                <div className="aspect-video w-full overflow-hidden bg-muted">
-                  <img
-                    src={post.coverImage}
-                    alt={post.title}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              )}
+              <div className="aspect-video w-full overflow-hidden bg-muted">
+                <img
+                  src={post.coverImage || blogPlaceholder}
+                  alt={post.title}
+                  className="h-full w-full object-cover"
+                />
+              </div>
               <CardContent className="p-4">
                 <h3 className="font-semibold text-lg mb-2 text-foreground line-clamp-1">
                   {post.title}
