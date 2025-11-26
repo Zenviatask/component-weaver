@@ -55,7 +55,7 @@ const Pages = () => {
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto py-6">
+      <div className="container mx-auto py-6 relative z-10">
         {isCreating || editingPost ? (
           <BlogPostForm
             post={editingPost || undefined}

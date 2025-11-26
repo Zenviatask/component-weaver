@@ -66,7 +66,7 @@ export const StyleEditor = ({ value, onChange }: StyleEditorProps) => {
   };
 
   return (
-    <Card>
+    <Card className="relative z-10">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Palette className="h-5 w-5" />
