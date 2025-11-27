@@ -20,7 +20,7 @@ export default function WidgetsGrid() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 w-full max-w-full"
+      className="rounded-2xl p-6 shadow-sm border border-gray-100 w-full max-w-full bg-white/30 backdrop-blur-md"
       // nunca aplique z-index alto aqui
       style={{ position: "relative" }}
       tabIndex={-1}

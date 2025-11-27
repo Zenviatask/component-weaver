@@ -24,8 +24,8 @@ export default function AnimatedBackground() {
       constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.vx = (Math.random() - 0.4) * 0.10;
-        this.vy = (Math.random() - 0.4) * 0.10;
+        this.vx = (Math.random() - 0.4) * 0.05;
+        this.vy = (Math.random() - 0.4) * 0.05;
         this.radius = Math.random() * 3 + 2;
 
         // Sorteia uma cor por partícula
@@ -45,8 +45,8 @@ export default function AnimatedBackground() {
           const distance = Math.sqrt(dx * dx + dy * dy);
           if (distance < mouseRadius) {
             const force = (mouseRadius - distance) / mouseRadius;
-            this.vx -= (dx / distance) * force * 0.02;
-            this.vy -= (dy / distance) * force * 0.02;
+            this.vx -= (dx / distance) * force * 0.01;
+            this.vy -= (dy / distance) * force * 0.01;
           }
         }
 

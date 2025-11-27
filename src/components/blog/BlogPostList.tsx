@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Pencil, Trash2, Plus, Eye } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Pencil, Trash2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -33,21 +33,69 @@ interface BlogPostListProps {
 
 export const BlogPostList = ({ posts, onEdit, onDelete, onCreate }: BlogPostListProps) => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+
+  const filteredPosts = useMemo(() => {
+    const term = search.toLowerCase().trim();
+    if (!term) return posts;
+    return posts.filter((post) => {
+      const title = post.title?.toLowerCase() ?? "";
+      const excerpt = post.excerpt?.toLowerCase() ?? "";
+      return title.includes(term) || excerpt.includes(term);
+    });
+  }, [posts, search]);
 
   return (
     <div className="space-y-4 relative z-10">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-2xl font-bold text-foreground">Posts do Blog</h2>
-        <Button onClick={onCreate} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Novo Post
-        </Button>
+
+        <div className="flex w-full gap-2 sm:w-auto">
+          <div className="relative flex-1 sm:w-64">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-search absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+
+            <input
+              type="search"
+              placeholder="Buscar posts..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background
+                         file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground
+                         placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2
+                         focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed
+                         disabled:opacity-50 md:text-sm pl-9"
+            />
+          </div>
+
+          <Button onClick={onCreate} className="gap-2 whitespace-nowrap">
+            <Plus className="h-4 w-4" />
+            Novo Post
+          </Button>
+        </div>
       </div>
 
-      {posts.length === 0 ? (
+      {filteredPosts.length === 0 ? (
         <Card className="relative z-10">
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <p className="text-muted-foreground mb-4">Nenhum post criado ainda</p>
+            <p className="text-muted-foreground mb-4">
+              {posts.length === 0
+                ? "Nenhum post criado ainda"
+                : "Nenhum post encontrado para esta busca"}
+            </p>
             <Button onClick={onCreate} variant="outline" className="gap-2">
               <Plus className="h-4 w-4" />
               Criar Primeiro Post
@@ -56,8 +104,11 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate }: BlogPostList
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post) => (
-            <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow z-10 relative">
+          {filteredPosts.map((post) => (
+            <Card
+              key={post.id}
+              className="overflow-hidden hover:shadow-lg transition-shadow z-10 relative"
+            >
               {post.coverImage && (
                 <div className="aspect-video w-full overflow-hidden bg-muted">
                   <img

@@ -20,7 +20,7 @@ export const StatCard = ({
   changePositive = true 
 }: StatCardProps) => {
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm bg-white/30 backdrop-blur-md transition-shadow hover:shadow-md">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm font-medium text-gray-500">{title}</p>

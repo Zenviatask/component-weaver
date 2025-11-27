@@ -10,7 +10,7 @@ import { PagesGallery } from "./PagesGallery";
 export const ContentDashboard = () => {
   return (
     <DashboardLayout>
-      <div className="p-4 lg:p-6 relative z-10">
+      <div className="p-4 lg:p-6 relative z-10 ">
         {/* Stats Grid */}
         {/*<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
@@ -48,7 +48,7 @@ export const ContentDashboard = () => {
         </div>*/}
 
         {/* Main Content Grid */}
-        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3 ">
           {/* Left Column - 2/3 width */}
           <div className="lg:col-span-2">
             <TrafficChart />

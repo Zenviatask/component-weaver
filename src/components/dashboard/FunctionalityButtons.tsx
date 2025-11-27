@@ -22,7 +22,7 @@ const functionalities = [
 
 export const FunctionalityButtons = () => {
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm bg-white/30 backdrop-blur-md">
       <h3 className="mb-6 text-lg font-semibold text-slate-800">Funcionalidades</h3>
       <div className="flex flex-wrap gap-3">
         {functionalities.map((func, index) => (

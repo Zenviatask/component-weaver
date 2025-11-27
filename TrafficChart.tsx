@@ -13,7 +13,7 @@ const data = [
 
 export const TrafficChart = () => {
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm bg-white/30 backdrop-blur-md">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-slate-800">Tráfego de Site</h3>

@@ -21,7 +21,7 @@ const sites = [
 
 export const SitesList = () => {
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-gray-100 shadow-sm bg-white/30 backdrop-blur-md">
       <div className="flex items-center justify-between border-b border-gray-100 p-6">
         <h3 className="text-lg font-semibold text-slate-800">Meus Sites</h3>
         <Button variant="ghost" size="icon" className="text-gray-400 hover:text-slate-800">

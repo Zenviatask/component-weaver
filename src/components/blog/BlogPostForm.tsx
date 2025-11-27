@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,12 +19,19 @@ import {
 import { StyleEditor } from "./StyleEditor";
 import { ArrowLeft, Save, Image as ImageIcon } from "lucide-react";
 import { BlogPost } from "./BlogPostList";
-import { useState } from "react";
 
 const formSchema = z.object({
-  title: z.string().min(1, "Título é obrigatório"),
-  excerpt: z.string().min(1, "Resumo é obrigatório"),
-  content: z.string().min(1, "Conteúdo é obrigatório"),
+  title: z.string().optional(),
+  link: z.string().optional(),
+  accessType: z.enum(["publico", "privado", "restrito"]).optional(),
+  authors: z.array(z.string()).optional(),
+  postDate: z.string().optional(),
+  categories: z.array(z.string()).optional().default([]),
+  tags: z.array(z.string()).optional().default([]),
+  profiles: z.array(z.string()).optional().default([]),
+  featured: z.boolean().optional().default(false),
+
+  excerpt: z.string().optional(),
   coverImage: z.string().optional(),
   customStyles: z.string().optional(),
 });
@@ -37,20 +46,42 @@ interface BlogPostFormProps {
 
 export const BlogPostForm = ({ post, onSubmit, onCancel }: BlogPostFormProps) => {
   const [imagePreview, setImagePreview] = useState<string>(post?.coverImage || "");
+  const [tagInput, setTagInput] = useState("");
+  const [categoryInput, setCategoryInput] = useState("");
+  const [profileInput, setProfileInput] = useState("");
+  const [authorInput, setAuthorInput] = useState("");
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: post?.title || "",
+      link: post?.link || "",
+      accessType: post?.accessType || "publico",
+      authors: post?.authors || [],
+      postDate: post?.postDate || "",
+      categories: post?.categories || [],
+      tags: post?.tags || [],
+      profiles: post?.profiles || [],
+      featured: post?.featured ?? false,
+
       excerpt: post?.excerpt || "",
-      content: post?.content || "",
       coverImage: post?.coverImage || "",
       customStyles: post?.customStyles || "",
     },
   });
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const addToArrayField = (fieldName: keyof FormData, value: string, clear: () => void) => {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+
+    const current = form.getValues(fieldName) as string[] | undefined;
+    const next = Array.isArray(current) ? [...current, trimmed] : [trimmed];
+    form.setValue(fieldName, next, { shouldDirty: true, shouldValidate: true });
+    clear();
+  };
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -80,6 +111,7 @@ export const BlogPostForm = ({ post, onSubmit, onCancel }: BlogPostFormProps) =>
               <CardTitle>Informações do Post</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Título */}
               <FormField
                 control={form.control}
                 name="title"
@@ -94,10 +126,294 @@ export const BlogPostForm = ({ post, onSubmit, onCancel }: BlogPostFormProps) =>
                 )}
               />
 
+              {/* Link */}
+              <FormField
+                control={form.control}
+                name="link"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Link</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Tipo de acesso */}
+              <FormField
+                control={form.control}
+                name="accessType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipo de acesso</FormLabel>
+                    <FormControl>
+                      <select
+                        className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                        value={field.value}
+                        onChange={field.onChange}
+                      >
+                        <option value="publico">Público</option>
+                        <option value="privado">Privado</option>
+                        <option value="restrito">Restrito</option>
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Autores */}
+              <FormField
+                control={form.control}
+                name="authors"
+                render={() => (
+                  <FormItem>
+                    <FormLabel>Autores</FormLabel>
+                    <FormControl>
+                      <div className="space-y-2">
+                        <Input
+                          value={authorInput}
+                          onChange={(event) => setAuthorInput(event.target.value)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              event.preventDefault();
+                              addToArrayField("authors", authorInput, () => setAuthorInput(""));
+                            }
+                          }}
+                          placeholder="Digite o nome e aperte Enter para adicionar"
+                        />
+                        <div className="flex flex-wrap gap-2">
+                          {(form.watch("authors") || []).map((author, index) => (
+                            <span
+                              key={`${author}-${index}`}
+                              className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs"
+                            >
+                              {author}
+                              <button
+                                type="button"
+                                className="text-xs text-muted-foreground hover:text-destructive"
+                                onClick={() => {
+                                  const current = form.getValues("authors") || [];
+                                  form.setValue(
+                                    "authors",
+                                    current.filter((item) => item !== author),
+                                    { shouldDirty: true, shouldValidate: true }
+                                  );
+                                }}
+                              >
+                                ×
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Data do post */}
+              <FormField
+                control={form.control}
+                name="postDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Data do post</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Categorias */}
+              <FormField
+                control={form.control}
+                name="categories"
+                render={() => (
+                  <FormItem>
+                    <FormLabel>Categorias</FormLabel>
+                    <FormControl>
+                      <div className="space-y-2">
+                        <Input
+                          value={categoryInput}
+                          onChange={(event) => setCategoryInput(event.target.value)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              event.preventDefault();
+                              addToArrayField("categories", categoryInput, () =>
+                                setCategoryInput("")
+                              );
+                            }
+                          }}
+                          placeholder="Digite a categoria e aperte Enter"
+                        />
+                        <div className="flex flex-wrap gap-2">
+                          {(form.watch("categories") || []).map((category, index) => (
+                            <span
+                              key={`${category}-${index}`}
+                              className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs"
+                            >
+                              {category}
+                              <button
+                                type="button"
+                                className="text-xs text-muted-foreground hover:text-destructive"
+                                onClick={() => {
+                                  const current = form.getValues("categories") || [];
+                                  form.setValue(
+                                    "categories",
+                                    current.filter((item) => item !== category),
+                                    { shouldDirty: true, shouldValidate: true }
+                                  );
+                                }}
+                              >
+                                ×
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </FormControl>
+                    <FormDescription>Aperte Enter para adicionar à lista</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Tags */}
+              <FormField
+                control={form.control}
+                name="tags"
+                render={() => (
+                  <FormItem>
+                    <FormLabel>Tags</FormLabel>
+                    <FormControl>
+                      <div className="space-y-2">
+                        <Input
+                          value={tagInput}
+                          onChange={(event) => setTagInput(event.target.value)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              event.preventDefault();
+                              addToArrayField("tags", tagInput, () => setTagInput(""));
+                            }
+                          }}
+                          placeholder="Digite a tag e aperte Enter"
+                        />
+                        <div className="flex flex-wrap gap-2">
+                          {(form.watch("tags") || []).map((tag, index) => (
+                            <span
+                              key={`${tag}-${index}`}
+                              className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs"
+                            >
+                              {tag}
+                              <button
+                                type="button"
+                                className="text-xs text-muted-foreground hover:text-destructive"
+                                onClick={() => {
+                                  const current = form.getValues("tags") || [];
+                                  form.setValue(
+                                    "tags",
+                                    current.filter((item) => item !== tag),
+                                    { shouldDirty: true, shouldValidate: true }
+                                  );
+                                }}
+                              >
+                                ×
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </FormControl>
+                    <FormDescription>Aperte Enter para adicionar à lista</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Perfis */}
+              <FormField
+                control={form.control}
+                name="profiles"
+                render={() => (
+                  <FormItem>
+                    <FormLabel>Perfis</FormLabel>
+                    <FormControl>
+                      <div className="space-y-2">
+                        <Input
+                          value={profileInput}
+                          onChange={(event) => setProfileInput(event.target.value)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              event.preventDefault();
+                              addToArrayField("profiles", profileInput, () =>
+                                setProfileInput("")
+                              );
+                            }
+                          }}
+                          placeholder="Digite o perfil e aperte Enter"
+                        />
+                        <div className="flex flex-wrap gap-2">
+                          {(form.watch("profiles") || []).map((profile, index) => (
+                            <span
+                              key={`${profile}-${index}`}
+                              className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs"
+                            >
+                              {profile}
+                              <button
+                                type="button"
+                                className="text-xs text-muted-foreground hover:text-destructive"
+                                onClick={() => {
+                                  const current = form.getValues("profiles") || [];
+                                  form.setValue(
+                                    "profiles",
+                                    current.filter((item) => item !== profile),
+                                    { shouldDirty: true, shouldValidate: true }
+                                  );
+                                }}
+                              >
+                                ×
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Destacar */}
+              <FormField
+                control={form.control}
+                name="featured"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center gap-2 space-y-0">
+                    <FormControl>
+                      <input
+                        type="checkbox"
+                        checked={field.value}
+                        onChange={(event) => field.onChange(event.target.checked)}
+                        className="h-4 w-4 rounded border"
+                      />
+                    </FormControl>
+                    <FormLabel className="!mt-0">Destacar</FormLabel>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Imagem de capa */}
               <FormField
                 control={form.control}
                 name="coverImage"
-                render={({ field }) => (
+                render={() => (
                   <FormItem>
                     <FormLabel>Imagem de Capa</FormLabel>
                     <FormControl>
@@ -152,6 +468,7 @@ export const BlogPostForm = ({ post, onSubmit, onCancel }: BlogPostFormProps) =>
                 )}
               />
 
+              {/* Resumo */}
               <FormField
                 control={form.control}
                 name="excerpt"
@@ -172,27 +489,10 @@ export const BlogPostForm = ({ post, onSubmit, onCancel }: BlogPostFormProps) =>
                   </FormItem>
                 )}
               />
-
-              <FormField
-                control={form.control}
-                name="content"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Conteúdo</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Escreva o conteúdo do post"
-                        className="min-h-[300px]"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </CardContent>
           </Card>
 
+          {/* Custom styles */}
           <FormField
             control={form.control}
             name="customStyles"
