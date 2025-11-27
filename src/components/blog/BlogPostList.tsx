@@ -1,7 +1,9 @@
 import { useState, useMemo } from "react";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,6 +14,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import blogPlaceholder from "@/assets/blog-placeholder.jpg";
 
 export interface BlogPost {
   id: string;
@@ -37,11 +52,29 @@ interface BlogPostListProps {
   onEdit: (post: BlogPost) => void;
   onDelete: (id: string) => void;
   onCreate: () => void;
+  onUpdateProperties?: (post: BlogPost) => void;
 }
 
-export const BlogPostList = ({ posts, onEdit, onDelete, onCreate }: BlogPostListProps) => {
+export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProperties }: BlogPostListProps) => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [editingProperties, setEditingProperties] = useState<BlogPost | null>(null);
+  
+  // Form state for properties dialog
+  const [propTitle, setPropTitle] = useState("");
+  const [propLink, setPropLink] = useState("");
+  const [propAccessType, setPropAccessType] = useState<"publico" | "privado" | "restrito">("publico");
+  const [propAuthors, setPropAuthors] = useState<string[]>([]);
+  const [propCategories, setPropCategories] = useState<string[]>([]);
+  const [propTags, setPropTags] = useState<string[]>([]);
+  const [propProfiles, setPropProfiles] = useState<string[]>([]);
+  const [propFeatured, setPropFeatured] = useState(false);
+  
+  // Input states for array fields
+  const [authorInput, setAuthorInput] = useState("");
+  const [categoryInput, setCategoryInput] = useState("");
+  const [tagInput, setTagInput] = useState("");
+  const [profileInput, setProfileInput] = useState("");
 
   const filteredPosts = useMemo(() => {
     const term = search.toLowerCase().trim();
@@ -52,6 +85,58 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate }: BlogPostList
       return title.includes(term) || excerpt.includes(term);
     });
   }, [posts, search]);
+
+  const openPropertiesDialog = (post: BlogPost) => {
+    setEditingProperties(post);
+    setPropTitle(post.title || "");
+    setPropLink(post.link || "");
+    setPropAccessType(post.accessType || "publico");
+    setPropAuthors(post.authors || []);
+    setPropCategories(post.categories || []);
+    setPropTags(post.tags || []);
+    setPropProfiles(post.profiles || []);
+    setPropFeatured(post.featured || false);
+  };
+
+  const handleSaveProperties = () => {
+    if (!editingProperties) return;
+    
+    const updatedPost: BlogPost = {
+      ...editingProperties,
+      title: propTitle,
+      link: propLink,
+      accessType: propAccessType,
+      authors: propAuthors,
+      categories: propCategories,
+      tags: propTags,
+      profiles: propProfiles,
+      featured: propFeatured,
+      updatedAt: new Date(),
+    };
+    
+    if (onUpdateProperties) {
+      onUpdateProperties(updatedPost);
+    }
+    setEditingProperties(null);
+  };
+
+  const addToArray = (
+    setter: React.Dispatch<React.SetStateAction<string[]>>,
+    value: string,
+    clearInput: () => void
+  ) => {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    setter((prev) => [...prev, trimmed]);
+    clearInput();
+  };
+
+  const removeFromArray = (
+    setter: React.Dispatch<React.SetStateAction<string[]>>,
+    value: string
+  ) => {
+    setter((prev) => prev.filter((item) => item !== value));
+  };
 
   return (
     <div className="space-y-4 relative z-10">
@@ -117,15 +202,13 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate }: BlogPostList
               key={post.id}
               className="overflow-hidden hover:shadow-lg transition-shadow z-10 relative"
             >
-              {post.coverImage && (
-                <div className="aspect-video w-full overflow-hidden bg-muted">
-                  <img
-                    src={post.coverImage}
-                    alt={post.title}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              )}
+              <div className="aspect-video w-full overflow-hidden bg-muted">
+                <img
+                  src={post.coverImage || blogPlaceholder}
+                  alt={post.title}
+                  className="h-full w-full object-cover"
+                />
+              </div>
               <CardContent className="p-4">
                 <h3 className="font-semibold text-lg mb-2 text-foreground line-clamp-1">
                   {post.title}
@@ -143,6 +226,20 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate }: BlogPostList
                     <Pencil className="h-3 w-3" />
                     Editar
                   </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openPropertiesDialog(post)}
+                      >
+                        <MoreHorizontal className="h-3 w-3" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Propriedades</p>
+                    </TooltipContent>
+                  </Tooltip>
                   <Button
                     size="sm"
                     variant="outline"
@@ -158,6 +255,7 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate }: BlogPostList
         </div>
       )}
 
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -180,6 +278,207 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate }: BlogPostList
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Properties Dialog */}
+      <Dialog open={!!editingProperties} onOpenChange={() => setEditingProperties(null)}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Propriedades do Post</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {/* Título */}
+            <div className="space-y-2">
+              <Label htmlFor="prop-title">Título</Label>
+              <Input
+                id="prop-title"
+                value={propTitle}
+                onChange={(e) => setPropTitle(e.target.value)}
+                placeholder="Digite o título do post"
+              />
+            </div>
+
+            {/* Link */}
+            <div className="space-y-2">
+              <Label htmlFor="prop-link">Link</Label>
+              <Input
+                id="prop-link"
+                value={propLink}
+                onChange={(e) => setPropLink(e.target.value)}
+                placeholder="https://..."
+              />
+            </div>
+
+            {/* Tipo de acesso */}
+            <div className="space-y-2">
+              <Label htmlFor="prop-access">Tipo de acesso</Label>
+              <select
+                id="prop-access"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={propAccessType}
+                onChange={(e) => setPropAccessType(e.target.value as "publico" | "privado" | "restrito")}
+              >
+                <option value="publico">Público</option>
+                <option value="privado">Privado</option>
+                <option value="restrito">Restrito</option>
+              </select>
+            </div>
+
+            {/* Autores */}
+            <div className="space-y-2">
+              <Label>Autores</Label>
+              <Input
+                value={authorInput}
+                onChange={(e) => setAuthorInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addToArray(setPropAuthors, authorInput, () => setAuthorInput(""));
+                  }
+                }}
+                placeholder="Digite o nome e aperte Enter"
+              />
+              <div className="flex flex-wrap gap-2">
+                {propAuthors.map((author, index) => (
+                  <span
+                    key={`${author}-${index}`}
+                    className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs"
+                  >
+                    {author}
+                    <button
+                      type="button"
+                      className="text-xs text-muted-foreground hover:text-destructive"
+                      onClick={() => removeFromArray(setPropAuthors, author)}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Categorias */}
+            <div className="space-y-2">
+              <Label>Categorias</Label>
+              <Input
+                value={categoryInput}
+                onChange={(e) => setCategoryInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addToArray(setPropCategories, categoryInput, () => setCategoryInput(""));
+                  }
+                }}
+                placeholder="Digite a categoria e aperte Enter"
+              />
+              <div className="flex flex-wrap gap-2">
+                {propCategories.map((category, index) => (
+                  <span
+                    key={`${category}-${index}`}
+                    className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs"
+                  >
+                    {category}
+                    <button
+                      type="button"
+                      className="text-xs text-muted-foreground hover:text-destructive"
+                      onClick={() => removeFromArray(setPropCategories, category)}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Tags */}
+            <div className="space-y-2">
+              <Label>Tags</Label>
+              <Input
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addToArray(setPropTags, tagInput, () => setTagInput(""));
+                  }
+                }}
+                placeholder="Digite a tag e aperte Enter"
+              />
+              <div className="flex flex-wrap gap-2">
+                {propTags.map((tag, index) => (
+                  <span
+                    key={`${tag}-${index}`}
+                    className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs"
+                  >
+                    {tag}
+                    <button
+                      type="button"
+                      className="text-xs text-muted-foreground hover:text-destructive"
+                      onClick={() => removeFromArray(setPropTags, tag)}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Perfis */}
+            <div className="space-y-2">
+              <Label>Perfis</Label>
+              <Input
+                value={profileInput}
+                onChange={(e) => setProfileInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addToArray(setPropProfiles, profileInput, () => setProfileInput(""));
+                  }
+                }}
+                placeholder="Digite o perfil e aperte Enter"
+              />
+              <div className="flex flex-wrap gap-2">
+                {propProfiles.map((profile, index) => (
+                  <span
+                    key={`${profile}-${index}`}
+                    className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs"
+                  >
+                    {profile}
+                    <button
+                      type="button"
+                      className="text-xs text-muted-foreground hover:text-destructive"
+                      onClick={() => removeFromArray(setPropProfiles, profile)}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Destacar */}
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="prop-featured"
+                checked={propFeatured}
+                onChange={(e) => setPropFeatured(e.target.checked)}
+                className="h-4 w-4 rounded border"
+              />
+              <Label htmlFor="prop-featured" className="!mt-0">Destacar</Label>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingProperties(null)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSaveProperties}>
+              Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

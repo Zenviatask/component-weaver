@@ -95,6 +95,15 @@ const Pages = () => {
     setIsCreating(false);
   };
 
+  const handleUpdateProperties = (updatedPost: BlogPost) => {
+    const newPosts = posts.map((p) =>
+      p.id === updatedPost.id ? updatedPost : p
+    );
+    setPosts(newPosts);
+    localStorage.setItem("blogPosts", JSON.stringify(newPosts));
+    toast.success("Propriedades atualizadas com sucesso");
+  };
+
   return (
     <DashboardLayout>
       <div className="container mx-auto py-6 relative z-10">
@@ -110,6 +119,7 @@ const Pages = () => {
             onEdit={handlePostClick}
             onDelete={handleDelete}
             onCreate={handleCreate}
+            onUpdateProperties={handleUpdateProperties}
           />
         )}
       </div>
