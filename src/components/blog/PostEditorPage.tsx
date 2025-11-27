@@ -34,7 +34,9 @@ export const PostEditorPage = () => {
     const hasImg = !!editor.dom.select("img")?.length;
     setHasImage(hasImg);
 
-    const hasH = !!(editor.dom.select("h2")?.length || editor.dom.select("h3")?.length);
+    const hasH = !!(
+      editor.dom.select("h2")?.length || editor.dom.select("h3")?.length
+    );
     setHasHeading(hasH);
   };
 
@@ -56,9 +58,7 @@ export const PostEditorPage = () => {
 
   return (
     <DashboardLayout>
-      {/* ocupa a tela inteira verticalmente */}
       <div className="flex min-h-screen flex-col gap-4 px-4 py-4 lg:px-8 lg:py-6">
-        {/* Breadcrumb e ações */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" onClick={handleBack}>
@@ -74,7 +74,8 @@ export const PostEditorPage = () => {
                 Editor de Conteúdo
               </h1>
               <p className="text-xs text-muted-foreground lg:text-sm">
-                Escreva matérias com textos formatados, imagens, áudios, vídeos e muito mais.
+                Escreva matérias com textos formatados, imagens, áudios, vídeos
+                e muito mais.
               </p>
             </div>
           </div>
@@ -84,83 +85,74 @@ export const PostEditorPage = () => {
           </Button>
         </div>
 
-        {/* área única para o editor, ocupando o restante da tela */}
-        <div className="flex flex-1">
-          <Card className="relative z-10 flex h-full w-full flex-1">
-            <div className="flex w-full flex-col">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold">Conteúdo do post</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-1 flex-col space-y-2">
-                <div className="height-100% rounded-md border bg-background">
-                  <Editor
-                    apiKey="qwtenc77z676k28xloz95dxkz50ttlxarqb3m3d25t2iance"
-                    value={contentHtml}
-                    init={{
-                      height: "flex", // usa toda a altura do container
-                      menubar: false,
-                      branding: false,
-                      statusbar: false,
-                      skin: "oxide",
-                      content_css: "default",
-                      language: "pt_BR",
-                      language_url: "/tinymce/langs/pt_BR.js", // coloque o arquivo de idioma neste caminho
-                      plugins: [
-                        "advlist",
-                        "autolink",
-                        "lists",
-                        "link",
-                        "image",
-                        "charmap",
-                        "preview",
-                        "anchor",
-                        "searchreplace",
-                        "visualblocks",
-                        "code",
-                        "fullscreen",
-                        "insertdatetime",
-                        "media",
-                        "table",
-                        "help",
-                        "wordcount",
-                      ],
-                      toolbar:
-                        "undo redo | styles | bold italic underline forecolor backcolor | " +
-                        "alignleft aligncenter alignright alignjustify | " +
-                        "bullist numlist outdent indent | blockquote | " +
-                        "link image media | table | removeformat | code fullscreen",
-                      image_caption: true,
-                      image_title: true,
-                      automatic_uploads: true,
-                      file_picker_types: "image media",
-                      file_picker_callback: (callback, _value, meta) => {
-                        const input = document.createElement("input");
-                        input.type = "file";
-                        if (meta.filetype === "image") {
-                          input.accept = "image/*";
-                        } else if (meta.filetype === "media") {
-                          input.accept = "audio/*,video/*";
-                        }
-                        input.onchange = () => {
-                          const file = input.files?.[0];
-                          if (!file) return;
-                          const reader = new FileReader();
-                          reader.onload = (e) => {
-                            const url = e.target?.result as string;
-                            callback(url, { title: file.name });
-                          };
-                          reader.readAsDataURL(file);
-                        };
-                        input.click();
-                      },
-                    }}
-                    onEditorChange={handleEditorChange}
-                  />
-                </div>
-              </CardContent>
-            </div>
-          </Card>
-        </div>
+        <Card className="relative z-10 flex h-full w-full flex-1">
+            <CardContent className="flex flex-1 flex-col space-y-2">
+            <Editor
+            apiKey="qwtenc77z676k28xloz95dxkz50ttlxarqb3m3d25t2iance"
+            value={contentHtml}
+            init={{
+                // altura acompanha o container (que tem flex-1)
+                height: "100%", // TinyMCE aceita número ou string com unidade.[web:5][web:24]
+                menubar: false,
+                branding: false,
+                statusbar: false,
+                skin: "oxide",
+                content_css: "default",
+                language: "pt-BR",
+                language_url: "/tinymce/langs/pt_BR.js",
+                plugins: [
+                "advlist",
+                "autolink",
+                "lists",
+                "link",
+                "image",
+                "charmap",
+                "preview",
+                "anchor",
+                "searchreplace",
+                "visualblocks",
+                "code",
+                // "fullscreen",
+                "insertdatetime",
+                "media",
+                "table",
+                "help",
+                "wordcount",
+                ],
+                toolbar:
+                "undo redo | styles | bold italic underline forecolor backcolor | " +
+                "alignleft aligncenter alignright alignjustify | " +
+                "bullist numlist outdent indent | blockquote | " +
+                "link image media | table | removeformat | code fullscreen",
+                image_caption: true,
+                image_title: true,
+                automatic_uploads: true,
+                file_picker_types: "image media",
+                file_picker_callback: (callback, _value, meta) => {
+                const input = document.createElement("input");
+                input.type = "file";
+                if (meta.filetype === "image") {
+                    input.accept = "image/*";
+                } else if (meta.filetype === "media") {
+                    input.accept = "audio/*,video/*";
+                }
+                input.onchange = () => {
+                    const file = input.files?.[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                    const url = e.target?.result as string;
+                    callback(url, { title: file.name });
+                    };
+                    reader.readAsDataURL(file);
+                };
+                input.click();
+                },
+            }}
+            onEditorChange={handleEditorChange}
+            />
+            </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   );
