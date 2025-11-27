@@ -16,7 +16,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { StyleEditor } from "./StyleEditor";
 import { ArrowLeft, Save, Image as ImageIcon } from "lucide-react";
 import { BlogPost } from "./BlogPostList";
 
@@ -33,7 +32,6 @@ const formSchema = z.object({
 
   excerpt: z.string().optional(),
   coverImage: z.string().optional(),
-  customStyles: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -66,7 +64,6 @@ export const BlogPostForm = ({ post, onSubmit, onCancel }: BlogPostFormProps) =>
 
       excerpt: post?.excerpt || "",
       coverImage: post?.coverImage || "",
-      customStyles: post?.customStyles || "",
     },
   });
 
@@ -491,20 +488,6 @@ export const BlogPostForm = ({ post, onSubmit, onCancel }: BlogPostFormProps) =>
               />
             </CardContent>
           </Card>
-
-          {/* Custom styles */}
-          <FormField
-            control={form.control}
-            name="customStyles"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <StyleEditor value={field.value || ""} onChange={field.onChange} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
 
           <div className="flex gap-4">
             <Button type="submit" className="gap-2">
