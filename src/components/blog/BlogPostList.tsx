@@ -1,7 +1,9 @@
 import { useState, useMemo } from "react";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import blogPlaceholder from "@/assets/blog-placeholder.jpg";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,62 +35,41 @@ interface BlogPostListProps {
 
 export const BlogPostList = ({ posts, onEdit, onDelete, onCreate }: BlogPostListProps) => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const filteredPosts = useMemo(() => {
-    const term = search.toLowerCase().trim();
-    if (!term) return posts;
-    return posts.filter((post) => {
-      const title = post.title?.toLowerCase() ?? "";
-      const excerpt = post.excerpt?.toLowerCase() ?? "";
-      return title.includes(term) || excerpt.includes(term);
-    });
-  }, [posts, search]);
+    if (!searchQuery.trim()) return posts;
+    
+    const query = searchQuery.toLowerCase();
+    return posts.filter(post => 
+      post.title.toLowerCase().includes(query) ||
+      post.excerpt.toLowerCase().includes(query) ||
+      post.content.toLowerCase().includes(query)
+    );
+  }, [posts, searchQuery]);
 
   return (
     <div className="space-y-4 relative z-10">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <h2 className="text-2xl font-bold text-foreground">Posts do Blog</h2>
-
-        <div className="flex w-full gap-2 sm:w-auto">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <div className="relative flex-1 sm:w-64">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="lucide lucide-search absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.3-4.3" />
-            </svg>
-
-            <input
-              type="search"
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
               placeholder="Buscar posts..."
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background
-                         file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground
-                         placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2
-                         focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed
-                         disabled:opacity-50 md:text-sm pl-9"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9"
             />
           </div>
-
-          <Button onClick={onCreate} className="gap-2 whitespace-nowrap">
+          <Button onClick={onCreate} className="gap-2">
             <Plus className="h-4 w-4" />
             Novo Post
           </Button>
         </div>
       </div>
 
-      {filteredPosts.length === 0 ? (
+      {filteredPosts.length === 0 && posts.length === 0 ? (
         <Card className="relative z-10">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <p className="text-muted-foreground mb-4">
@@ -102,22 +83,23 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate }: BlogPostList
             </Button>
           </CardContent>
         </Card>
+      ) : filteredPosts.length === 0 ? (
+        <Card className="relative z-10">
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <p className="text-muted-foreground">Nenhum post encontrado com "{searchQuery}"</p>
+          </CardContent>
+        </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filteredPosts.map((post) => (
-            <Card
-              key={post.id}
-              className="overflow-hidden hover:shadow-lg transition-shadow z-10 relative"
-            >
-              {post.coverImage && (
-                <div className="aspect-video w-full overflow-hidden bg-muted">
-                  <img
-                    src={post.coverImage}
-                    alt={post.title}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              )}
+            <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow z-10 relative">
+              <div className="aspect-video w-full overflow-hidden bg-muted">
+                <img
+                  src={post.coverImage || blogPlaceholder}
+                  alt={post.title}
+                  className="h-full w-full object-cover"
+                />
+              </div>
               <CardContent className="p-4">
                 <h3 className="font-semibold text-lg mb-2 text-foreground line-clamp-1">
                   {post.title}
