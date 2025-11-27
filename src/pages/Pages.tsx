@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { BlogPostList, BlogPost } from "@/components/blog/BlogPostList";
 import { BlogPostForm } from "@/components/blog/BlogPostForm";
+import { StyleEditor } from "@/components/blog/StyleEditor";
 import { toast } from "sonner";
 
 const Pages = () => {
@@ -10,19 +11,24 @@ const Pages = () => {
   const location = useLocation();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [isCreating, setIsCreating] = useState(false);
+  const [globalStyles, setGlobalStyles] = useState("");
 
-  // Load posts from localStorage on mount
+  // Load posts and global styles from localStorage on mount
   useEffect(() => {
     const savedPosts = localStorage.getItem("blogPosts");
     if (savedPosts) {
       const parsed = JSON.parse(savedPosts);
-      // Convert date strings back to Date objects
       const postsWithDates = parsed.map((p: any) => ({
         ...p,
         createdAt: new Date(p.createdAt),
         updatedAt: new Date(p.updatedAt),
       }));
       setPosts(postsWithDates);
+    }
+
+    const savedStyles = localStorage.getItem("blogGlobalStyles");
+    if (savedStyles) {
+      setGlobalStyles(savedStyles);
     }
   }, []);
 
@@ -52,7 +58,6 @@ const Pages = () => {
         }
         return newPosts;
       });
-      // Clear the state to prevent re-processing
       window.history.replaceState({}, document.title);
     }
   }, [location.state]);
@@ -77,11 +82,11 @@ const Pages = () => {
       id: Math.random().toString(36).substr(2, 9),
       ...data,
       content: "",
+      customStyles: "",
       createdAt: new Date(),
       updatedAt: new Date(),
     };
 
-    // Save post to state and localStorage
     const newPosts = [newPost, ...posts];
     setPosts(newPosts);
     localStorage.setItem("blogPosts", JSON.stringify(newPosts));
@@ -104,9 +109,14 @@ const Pages = () => {
     toast.success("Propriedades atualizadas com sucesso");
   };
 
+  const handleStylesChange = (styles: string) => {
+    setGlobalStyles(styles);
+    localStorage.setItem("blogGlobalStyles", styles);
+  };
+
   return (
     <DashboardLayout>
-      <div className="container mx-auto py-6 relative z-10">
+      <div className="container mx-auto py-6 relative z-10 space-y-6">
         {isCreating ? (
           <BlogPostForm
             post={undefined}
@@ -114,13 +124,20 @@ const Pages = () => {
             onCancel={handleCancel}
           />
         ) : (
-          <BlogPostList
-            posts={posts}
-            onEdit={handlePostClick}
-            onDelete={handleDelete}
-            onCreate={handleCreate}
-            onUpdateProperties={handleUpdateProperties}
-          />
+          <>
+            <BlogPostList
+              posts={posts}
+              onEdit={handlePostClick}
+              onDelete={handleDelete}
+              onCreate={handleCreate}
+              onUpdateProperties={handleUpdateProperties}
+            />
+            
+            <StyleEditor
+              value={globalStyles}
+              onChange={handleStylesChange}
+            />
+          </>
         )}
       </div>
     </DashboardLayout>
