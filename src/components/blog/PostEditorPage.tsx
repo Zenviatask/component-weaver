@@ -1,19 +1,31 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, Save, ChevronRight } from "lucide-react";
 import { Editor } from "@tinymce/tinymce-react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { toast } from "sonner";
+import { BlogPost } from "./BlogPostList";
 
 export const PostEditorPage = () => {
-  const [title, setTitle] = useState("Título 1");
-  const [subtitle, setSubtitle] = useState("");
-  const [slug, setSlug] = useState("");
-  const [summary, setSummary] = useState("");
-  const [contentHtml, setContentHtml] = useState("");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const postFromState = location.state?.post as BlogPost | undefined;
+  const isNew = location.state?.isNew as boolean | undefined;
+
+  const [title, setTitle] = useState(postFromState?.title || "Título 1");
+  const [contentHtml, setContentHtml] = useState(postFromState?.content || "");
   const [wordCount, setWordCount] = useState(0);
   const [hasImage, setHasImage] = useState(false);
   const [hasHeading, setHasHeading] = useState(false);
+
+  useEffect(() => {
+    if (postFromState) {
+      setTitle(postFromState.title || "");
+      setContentHtml(postFromState.content || "");
+    }
+  }, [postFromState]);
 
   const progress = useMemo(() => {
     let score = 0;
@@ -41,19 +53,36 @@ export const PostEditorPage = () => {
   };
 
   const handleSave = () => {
-    const payload = {
+    if (!postFromState) {
+      toast.error("Nenhum post encontrado para salvar");
+      return;
+    }
+
+    const updatedPost: BlogPost = {
+      ...postFromState,
       title,
-      subtitle,
-      slug,
-      summary,
-      contentHtml,
-      wordCount,
+      content: contentHtml,
+      updatedAt: new Date(),
     };
-    console.log("Salvar post", payload);
+
+    // Save to localStorage for persistence across navigation
+    const savedPosts = JSON.parse(localStorage.getItem("blogPosts") || "[]");
+    const existingIndex = savedPosts.findIndex((p: BlogPost) => p.id === updatedPost.id);
+    
+    if (existingIndex >= 0) {
+      savedPosts[existingIndex] = updatedPost;
+    } else {
+      savedPosts.unshift(updatedPost);
+    }
+    
+    localStorage.setItem("blogPosts", JSON.stringify(savedPosts));
+    
+    toast.success("Post salvo com sucesso!");
+    navigate("/pages", { state: { updatedPost } });
   };
 
   const handleBack = () => {
-    window.history.back();
+    navigate("/pages");
   };
 
   return (
@@ -68,7 +97,7 @@ export const PostEditorPage = () => {
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <span>Meus posts</span>
                 <ChevronRight className="h-3 w-3" />
-                <span className="font-medium">Teste</span>
+                <span className="font-medium">{title || "Novo Post"}</span>
               </div>
               <h1 className="text-xl font-bold text-foreground lg:text-2xl">
                 Editor de Conteúdo
@@ -86,13 +115,12 @@ export const PostEditorPage = () => {
         </div>
 
         <Card className="relative z-10 flex h-full w-full flex-1">
-            <CardContent className="flex flex-1 flex-col space-y-2">
+          <CardContent className="flex flex-1 flex-col space-y-2">
             <Editor
-            apiKey="qwtenc77z676k28xloz95dxkz50ttlxarqb3m3d25t2iance"
-            value={contentHtml}
-            init={{
-                // altura acompanha o container (que tem flex-1)
-                height: "100%", // TinyMCE aceita número ou string com unidade.[web:5][web:24]
+              apiKey="qwtenc77z676k28xloz95dxkz50ttlxarqb3m3d25t2iance"
+              value={contentHtml}
+              init={{
+                height: "100%",
                 menubar: false,
                 branding: false,
                 statusbar: false,
@@ -101,57 +129,56 @@ export const PostEditorPage = () => {
                 language: "pt-BR",
                 language_url: "/tinymce/langs/pt_BR.js",
                 plugins: [
-                "advlist",
-                "autolink",
-                "lists",
-                "link",
-                "image",
-                "charmap",
-                "preview",
-                "anchor",
-                "searchreplace",
-                "visualblocks",
-                "code",
-                // "fullscreen",
-                "insertdatetime",
-                "media",
-                "table",
-                "help",
-                "wordcount",
+                  "advlist",
+                  "autolink",
+                  "lists",
+                  "link",
+                  "image",
+                  "charmap",
+                  "preview",
+                  "anchor",
+                  "searchreplace",
+                  "visualblocks",
+                  "code",
+                  "insertdatetime",
+                  "media",
+                  "table",
+                  "help",
+                  "wordcount",
                 ],
                 toolbar:
-                "undo redo | styles | bold italic underline forecolor backcolor | " +
-                "alignleft aligncenter alignright alignjustify | " +
-                "bullist numlist outdent indent | blockquote | " +
-                "link image media | table | removeformat | code fullscreen",
+                  "undo redo | styles | bold italic underline forecolor backcolor | " +
+                  "alignleft aligncenter alignright alignjustify | " +
+                  "bullist numlist outdent indent | blockquote | " +
+                  "link image media | table | removeformat | code fullscreen",
                 image_caption: true,
                 image_title: true,
                 automatic_uploads: true,
                 file_picker_types: "image media",
                 file_picker_callback: (callback, _value, meta) => {
-                const input = document.createElement("input");
-                input.type = "file";
-                if (meta.filetype === "image") {
+                  const input = document.createElement("input");
+                  input.type = "file";
+                  if (meta.filetype === "image") {
                     input.accept = "image/*";
-                } else if (meta.filetype === "media") {
+                  } else if (meta.filetype === "media") {
                     input.accept = "audio/*,video/*";
-                }
-                input.onchange = () => {
+                  }
+                  input.onchange = () => {
                     const file = input.files?.[0];
                     if (!file) return;
                     const reader = new FileReader();
                     reader.onload = (e) => {
-                    const url = e.target?.result as string;
-                    callback(url, { title: file.name });
+                      const url = e.target?.result as string;
+                      callback(url, { title: file.name });
                     };
                     reader.readAsDataURL(file);
-                };
-                input.click();
+                  };
+                  input.click();
                 },
-            }}
-            onEditorChange={handleEditorChange}
+              }}
+              onEditorChange={handleEditorChange}
             />
-            </CardContent>
+          </CardContent>
         </Card>
       </div>
     </DashboardLayout>

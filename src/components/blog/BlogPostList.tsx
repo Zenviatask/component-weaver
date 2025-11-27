@@ -22,6 +22,14 @@ export interface BlogPost {
   customStyles: string;
   createdAt: Date;
   updatedAt: Date;
+  link?: string;
+  accessType?: "publico" | "privado" | "restrito";
+  authors?: string[];
+  postDate?: string;
+  categories?: string[];
+  tags?: string[];
+  profiles?: string[];
+  featured?: boolean;
 }
 
 interface BlogPostListProps {
