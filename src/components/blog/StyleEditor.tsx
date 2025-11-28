@@ -3,8 +3,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Palette, Code } from "lucide-react";
+import { Palette, Code, ChevronDown } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 interface StyleEditorProps {
   value: string;
@@ -13,6 +17,7 @@ interface StyleEditorProps {
 
 export const StyleEditor = ({ value, onChange }: StyleEditorProps) => {
   const [mode, setMode] = useState<"simple" | "advanced">("simple");
+  const [isOpen, setIsOpen] = useState(false);
 
   // Parse simple styles from CSS string
   const parseSimpleStyles = (css: string) => {
@@ -66,17 +71,15 @@ export const StyleEditor = ({ value, onChange }: StyleEditorProps) => {
   };
 
   return (
-    <Card className="relative z-10">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Palette className="h-5 w-5" />
-          Estilos Personalizados
-        </CardTitle>
-        <CardDescription>
-          Personalize a aparência do seu post
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="relative z-10">
+      <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-input bg-card p-4 hover:bg-accent/50 transition-colors">
+        <div className="flex items-center gap-2">
+          <Palette className="h-5 w-5 text-muted-foreground" />
+          <span className="font-semibold text-foreground">Estilos Personalizados</span>
+        </div>
+        <ChevronDown className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="mt-2 rounded-lg border border-input bg-card p-4">
         <Tabs value={mode} onValueChange={(v) => setMode(v as "simple" | "advanced")}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="simple" className="gap-2">
@@ -187,7 +190,7 @@ export const StyleEditor = ({ value, onChange }: StyleEditorProps) => {
             </div>
           </TabsContent>
         </Tabs>
-      </CardContent>
-    </Card>
+      </CollapsibleContent>
+    </Collapsible>
   );
 };

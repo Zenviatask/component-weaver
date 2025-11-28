@@ -1,5 +1,5 @@
-import { useState, useMemo, useRef, useCallback } from "react";
-import { Pencil, Trash2, Plus, MoreHorizontal } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Pencil, Trash2, Plus, MoreHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -55,51 +55,13 @@ interface BlogPostListProps {
   onUpdateProperties?: (post: BlogPost) => void;
 }
 
+const POSTS_PER_PAGE = 8; // 4 columns x 2 rows
+
 export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProperties }: BlogPostListProps) => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [editingProperties, setEditingProperties] = useState<BlogPost | null>(null);
-  
-  // Mouse drag scroll state
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const isMouseDown = useRef(false);
-  const startX = useRef(0);
-  const scrollLeftRef = useRef(0);
-  const hasDragged = useRef(false);
-
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    // Only start drag if clicking on the container itself or cards, not buttons
-    const target = e.target as HTMLElement;
-    if (target.closest('button')) return;
-    
-    if (!scrollContainerRef.current) return;
-    isMouseDown.current = true;
-    hasDragged.current = false;
-    startX.current = e.pageX - scrollContainerRef.current.offsetLeft;
-    scrollLeftRef.current = scrollContainerRef.current.scrollLeft;
-  }, []);
-
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!isMouseDown.current || !scrollContainerRef.current) return;
-    
-    const x = e.pageX - scrollContainerRef.current.offsetLeft;
-    const walk = (x - startX.current) * 1.5;
-    
-    // Only consider it a drag if moved more than 5px
-    if (Math.abs(walk) > 5) {
-      hasDragged.current = true;
-      e.preventDefault();
-      scrollContainerRef.current.scrollLeft = scrollLeftRef.current - walk;
-    }
-  }, []);
-
-  const handleMouseUp = useCallback(() => {
-    isMouseDown.current = false;
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    isMouseDown.current = false;
-  }, []);
+  const [currentPage, setCurrentPage] = useState(1);
   
   // Form state for properties dialog
   const [propTitle, setPropTitle] = useState("");
@@ -126,6 +88,18 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProper
       return title.includes(term) || excerpt.includes(term);
     });
   }, [posts, search]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+  const paginatedPosts = useMemo(() => {
+    const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+    return filteredPosts.slice(startIndex, startIndex + POSTS_PER_PAGE);
+  }, [filteredPosts, currentPage]);
+
+  // Reset to page 1 when search changes
+  useMemo(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   const openPropertiesDialog = (post: BlogPost) => {
     setEditingProperties(post);
@@ -237,19 +211,12 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProper
           </CardContent>
         </Card>
       ) : (
-        <div 
-          ref={scrollContainerRef}
-          className="overflow-x-auto pb-4 -mx-4 px-4 select-none cursor-grab active:cursor-grabbing"
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseLeave}
-        >
-          <div className="flex gap-4" style={{ width: 'max-content' }}>
-            {filteredPosts.map((post) => (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {paginatedPosts.map((post) => (
               <Card
                 key={post.id}
-                className="overflow-hidden hover:shadow-lg transition-shadow z-10 relative w-[280px] flex-shrink-0"
+                className="overflow-hidden hover:shadow-lg transition-shadow z-10 relative"
               >
                 <div className="aspect-video w-full overflow-hidden bg-muted">
                   <img
@@ -302,6 +269,43 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProper
               </Card>
             ))}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 pt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(page)}
+                    className="w-8 h-8 p-0"
+                  >
+                    {page}
+                  </Button>
+                ))}
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
       )}
 
