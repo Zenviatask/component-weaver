@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useCallback } from "react";
 import { Pencil, Trash2, Plus, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -59,6 +59,35 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProper
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [editingProperties, setEditingProperties] = useState<BlogPost | null>(null);
+  
+  // Mouse drag scroll state
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (!scrollContainerRef.current) return;
+    setIsDragging(true);
+    setStartX(e.pageX - scrollContainerRef.current.offsetLeft);
+    setScrollLeft(scrollContainerRef.current.scrollLeft);
+  }, []);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!isDragging || !scrollContainerRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollContainerRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    scrollContainerRef.current.scrollLeft = scrollLeft - walk;
+  }, [isDragging, startX, scrollLeft]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setIsDragging(false);
+  }, []);
   
   // Form state for properties dialog
   const [propTitle, setPropTitle] = useState("");
@@ -196,7 +225,14 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProper
           </CardContent>
         </Card>
       ) : (
-        <div className="overflow-x-auto pb-4 -mx-4 px-4 cursor-grab active:cursor-grabbing">
+        <div 
+          ref={scrollContainerRef}
+          className={`overflow-x-auto pb-4 -mx-4 px-4 select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
+        >
           <div className="flex gap-4" style={{ width: 'max-content' }}>
             {filteredPosts.map((post) => (
               <Card
