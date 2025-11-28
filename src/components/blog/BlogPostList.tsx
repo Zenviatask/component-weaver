@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Pencil, Trash2, Plus, MoreHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
+import { Pencil, Trash2, Plus, MoreHorizontal, ChevronLeft, ChevronRight, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -60,9 +60,23 @@ const POSTS_PER_PAGE = 8; // 4 columns x 2 rows
 export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProperties }: BlogPostListProps) => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+
   const [editingProperties, setEditingProperties] = useState<BlogPost | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  
+
+  // FILTROS (usados no modal)
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  const [filterTitle, setFilterTitle] = useState("");
+  const [filterLink, setFilterLink] = useState("");
+  const [filterAccessType, setFilterAccessType] = useState<"publico" | "privado" | "restrito" | "">("");
+  const [filterAuthor, setFilterAuthor] = useState("");
+  const [filterPostDate, setFilterPostDate] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
+  const [filterTag, setFilterTag] = useState("");
+  const [filterProfile, setFilterProfile] = useState("");
+  const [filterFeatured, setFilterFeatured] = useState<"all" | "featured" | "notFeatured">("all");
+
   // Form state for properties dialog
   const [propTitle, setPropTitle] = useState("");
   const [propLink, setPropLink] = useState("");
@@ -72,22 +86,127 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProper
   const [propTags, setPropTags] = useState<string[]>([]);
   const [propProfiles, setPropProfiles] = useState<string[]>([]);
   const [propFeatured, setPropFeatured] = useState(false);
-  
+
   // Input states for array fields
   const [authorInput, setAuthorInput] = useState("");
   const [categoryInput, setCategoryInput] = useState("");
   const [tagInput, setTagInput] = useState("");
   const [profileInput, setProfileInput] = useState("");
 
+  const resetFilters = () => {
+    setFilterTitle("");
+    setFilterLink("");
+    setFilterAccessType("");
+    setFilterAuthor("");
+    setFilterPostDate("");
+    setFilterCategory("");
+    setFilterTag("");
+    setFilterProfile("");
+    setFilterFeatured("all");
+  };
+
   const filteredPosts = useMemo(() => {
     const term = search.toLowerCase().trim();
-    if (!term) return posts;
+
     return posts.filter((post) => {
+      // Busca livre (input de texto principal)
       const title = post.title?.toLowerCase() ?? "";
       const excerpt = post.excerpt?.toLowerCase() ?? "";
-      return title.includes(term) || excerpt.includes(term);
+      const link = post.link?.toLowerCase() ?? "";
+
+      const matchesSearch = !term
+        ? true
+        : title.includes(term) || excerpt.includes(term) || link.includes(term);
+
+      // Título
+      const filterTitleTerm = filterTitle.toLowerCase().trim();
+      const matchesTitle = !filterTitleTerm
+        ? true
+        : title.includes(filterTitleTerm);
+
+      // Link
+      const filterLinkTerm = filterLink.toLowerCase().trim();
+      const matchesLink = !filterLinkTerm
+        ? true
+        : link.includes(filterLinkTerm);
+
+      // Tipo de acesso
+      const matchesAccessType = !filterAccessType
+        ? true
+        : post.accessType === filterAccessType;
+
+      // Autor
+      const authorTerm = filterAuthor.toLowerCase().trim();
+      const matchesAuthor = !authorTerm
+        ? true
+        : (post.authors ?? []).some((a) =>
+            a.toLowerCase().includes(authorTerm)
+          );
+
+      // Data do post (string livre, você pode trocar por date)
+      const postDateTerm = filterPostDate.trim();
+      const matchesPostDate = !postDateTerm
+        ? true
+        : (post.postDate ?? "").includes(postDateTerm);
+
+      // Categoria
+      const categoryTerm = filterCategory.toLowerCase().trim();
+      const matchesCategory = !categoryTerm
+        ? true
+        : (post.categories ?? []).some((c) =>
+            c.toLowerCase().includes(categoryTerm)
+          );
+
+      // Tag
+      const tagTerm = filterTag.toLowerCase().trim();
+      const matchesTag = !tagTerm
+        ? true
+        : (post.tags ?? []).some((t) =>
+            t.toLowerCase().includes(tagTerm)
+          );
+
+      // Perfil
+      const profileTerm = filterProfile.toLowerCase().trim();
+      const matchesProfile = !profileTerm
+        ? true
+        : (post.profiles ?? []).some((p) =>
+            p.toLowerCase().includes(profileTerm)
+          );
+
+      // Destacar
+      const matchesFeatured =
+        filterFeatured === "all"
+          ? true
+          : filterFeatured === "featured"
+          ? !!post.featured
+          : !post.featured;
+
+      return (
+        matchesSearch &&
+        matchesTitle &&
+        matchesLink &&
+        matchesAccessType &&
+        matchesAuthor &&
+        matchesPostDate &&
+        matchesCategory &&
+        matchesTag &&
+        matchesProfile &&
+        matchesFeatured
+      );
     });
-  }, [posts, search]);
+  }, [
+    posts,
+    search,
+    filterTitle,
+    filterLink,
+    filterAccessType,
+    filterAuthor,
+    filterPostDate,
+    filterCategory,
+    filterTag,
+    filterProfile,
+    filterFeatured,
+  ]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
@@ -96,10 +215,21 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProper
     return filteredPosts.slice(startIndex, startIndex + POSTS_PER_PAGE);
   }, [filteredPosts, currentPage]);
 
-  // Reset to page 1 when search changes
+  // Reset to page 1 when search or filtros mudarem
   useMemo(() => {
     setCurrentPage(1);
-  }, [search]);
+  }, [
+    search,
+    filterTitle,
+    filterLink,
+    filterAccessType,
+    filterAuthor,
+    filterPostDate,
+    filterCategory,
+    filterTag,
+    filterProfile,
+    filterFeatured,
+  ]);
 
   const openPropertiesDialog = (post: BlogPost) => {
     setEditingProperties(post);
@@ -115,7 +245,7 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProper
 
   const handleSaveProperties = () => {
     if (!editingProperties) return;
-    
+
     const updatedPost: BlogPost = {
       ...editingProperties,
       title: propTitle,
@@ -128,7 +258,7 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProper
       featured: propFeatured,
       updatedAt: new Date(),
     };
-    
+
     if (onUpdateProperties) {
       onUpdateProperties(updatedPost);
     }
@@ -182,12 +312,29 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProper
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background
-                         file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground
-                         placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2
-                         focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed
-                         disabled:opacity-50 md:text-sm pl-9"
+                        file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground
+                        placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2
+                        focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed
+                        disabled:opacity-50 md:text-sm pl-9"
             />
           </div>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                className="gap-2 whitespace-nowrap"
+                onClick={() => setFiltersOpen(true)}
+                aria-label="Abrir filtros avançados"
+              >
+                <Filter className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="top" align="center">
+              Filtros Avançados
+            </TooltipContent>
+          </Tooltip>
 
           <Button onClick={onCreate} className="gap-2 whitespace-nowrap">
             <Plus className="h-4 w-4" />
@@ -281,7 +428,7 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProper
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              
+
               <div className="flex items-center gap-1">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <Button
@@ -339,7 +486,7 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProper
           <DialogHeader>
             <DialogTitle>Propriedades do Post</DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             {/* Título */}
             <div className="space-y-2">
@@ -530,6 +677,150 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProper
             <Button onClick={handleSaveProperties}>
               Salvar
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* FILTERS MODAL */}
+      <Dialog open={filtersOpen} onOpenChange={setFiltersOpen}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Filtros Avançados</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Título */}
+            <div className="space-y-2">
+              <Label htmlFor="filter-title">Título</Label>
+              <Input
+                id="filter-title"
+                value={filterTitle}
+                onChange={(e) => setFilterTitle(e.target.value)}
+                placeholder="Filtrar por título"
+              />
+            </div>
+
+            {/* Link */}
+            <div className="space-y-2">
+              <Label htmlFor="filter-link">Link</Label>
+              <Input
+                id="filter-link"
+                value={filterLink}
+                onChange={(e) => setFilterLink(e.target.value)}
+                placeholder="Filtrar por link"
+              />
+            </div>
+
+            {/* Tipo de acesso */}
+            <div className="space-y-2">
+              <Label htmlFor="filter-access">Tipo de acesso</Label>
+              <select
+                id="filter-access"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={filterAccessType}
+                onChange={(e) => setFilterAccessType(e.target.value as any)}
+              >
+                <option value="">Todos</option>
+                <option value="publico">Público</option>
+                <option value="privado">Privado</option>
+                <option value="restrito">Restrito</option>
+              </select>
+            </div>
+
+            {/* Autores */}
+            <div className="space-y-2">
+              <Label htmlFor="filter-author">Autores</Label>
+              <Input
+                id="filter-author"
+                value={filterAuthor}
+                onChange={(e) => setFilterAuthor(e.target.value)}
+                placeholder="Nome do autor"
+              />
+            </div>
+
+            {/* Data do post */}
+            <div className="space-y-2">
+              <Label htmlFor="filter-post-date">Data do post</Label>
+              <Input
+                id="filter-post-date"
+                value={filterPostDate}
+                onChange={(e) => setFilterPostDate(e.target.value)}
+                placeholder="Ex: 2025-11-28"
+              />
+            </div>
+
+            {/* Categorias */}
+            <div className="space-y-2">
+              <Label htmlFor="filter-category">Categorias</Label>
+              <Input
+                id="filter-category"
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+                placeholder="Categoria"
+              />
+            </div>
+
+            {/* Tags */}
+            <div className="space-y-2">
+              <Label htmlFor="filter-tag">Tags</Label>
+              <Input
+                id="filter-tag"
+                value={filterTag}
+                onChange={(e) => setFilterTag(e.target.value)}
+                placeholder="Tag"
+              />
+            </div>
+
+            {/* Perfis */}
+            <div className="space-y-2">
+              <Label htmlFor="filter-profile">Perfis</Label>
+              <Input
+                id="filter-profile"
+                value={filterProfile}
+                onChange={(e) => setFilterProfile(e.target.value)}
+                placeholder="Perfil"
+              />
+            </div>
+
+            {/* Destacar */}
+            <div className="space-y-2">
+              <Label htmlFor="filter-featured">Destacar</Label>
+              <select
+                id="filter-featured"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={filterFeatured}
+                onChange={(e) => setFilterFeatured(e.target.value as any)}
+              >
+                <option value="all">Todos</option>
+                <option value="featured">Somente destacados</option>
+                <option value="notFeatured">Somente não destacados</option>
+              </select>
+            </div>
+          </div>
+
+          <DialogFooter className="flex justify-between gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={resetFilters}
+            >
+              Limpar filtros
+            </Button>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setFiltersOpen(false)}
+              >
+                Fechar
+              </Button>
+              <Button
+                type="button"
+                onClick={() => setFiltersOpen(false)}
+              >
+                Aplicar
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
