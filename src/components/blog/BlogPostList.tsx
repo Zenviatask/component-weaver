@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Pencil, Trash2, Plus, MoreHorizontal, ChevronDown } from "lucide-react";
+import { Pencil, Trash2, Plus, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -26,13 +26,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import blogPlaceholder from "@/assets/blog-placeholder.jpg";
 
 export interface BlogPost {
@@ -203,105 +196,64 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProper
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-3">
-          {/* Horizontal scroll area with visible posts */}
-          <ScrollArea className="w-full whitespace-nowrap rounded-lg">
-            <div className="flex gap-4 pb-4">
-              {filteredPosts.slice(0, 4).map((post) => (
-                <Card
-                  key={post.id}
-                  className="overflow-hidden hover:shadow-lg transition-shadow z-10 relative w-[280px] flex-shrink-0"
-                >
-                  <div className="aspect-video w-full overflow-hidden bg-muted">
-                    <img
-                      src={post.coverImage || blogPlaceholder}
-                      alt={post.title}
-                      className="h-full w-full object-cover"
-                    />
+        <div className="overflow-x-auto pb-4 -mx-4 px-4 cursor-grab active:cursor-grabbing">
+          <div className="flex gap-4" style={{ width: 'max-content' }}>
+            {filteredPosts.map((post) => (
+              <Card
+                key={post.id}
+                className="overflow-hidden hover:shadow-lg transition-shadow z-10 relative w-[280px] flex-shrink-0"
+              >
+                <div className="aspect-video w-full overflow-hidden bg-muted">
+                  <img
+                    src={post.coverImage || blogPlaceholder}
+                    alt={post.title}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-lg mb-2 text-foreground line-clamp-1">
+                    {post.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                    {post.excerpt}
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => onEdit(post)}
+                      className="flex-1 gap-2"
+                    >
+                      <Pencil className="h-3 w-3" />
+                      Editar
+                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => openPropertiesDialog(post)}
+                        >
+                          <MoreHorizontal className="h-3 w-3" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Propriedades</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setDeleteId(post.id)}
+                      className="gap-2"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
                   </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold text-lg mb-2 text-foreground line-clamp-1 whitespace-normal">
-                      {post.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2 whitespace-normal">
-                      {post.excerpt}
-                    </p>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => onEdit(post)}
-                        className="flex-1 gap-2"
-                      >
-                        <Pencil className="h-3 w-3" />
-                        Editar
-                      </Button>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => openPropertiesDialog(post)}
-                          >
-                            <MoreHorizontal className="h-3 w-3" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Propriedades</p>
-                        </TooltipContent>
-                      </Tooltip>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setDeleteId(post.id)}
-                        className="gap-2"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
-
-          {/* Ver mais dropdown for remaining posts */}
-          {filteredPosts.length > 4 && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-2">
-                  <ChevronDown className="h-4 w-4" />
-                  Ver mais ({filteredPosts.length - 4} posts)
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-[300px] max-h-[400px] overflow-y-auto bg-background">
-                {filteredPosts.slice(4).map((post) => (
-                  <DropdownMenuItem
-                    key={post.id}
-                    className="flex items-center gap-3 p-3 cursor-pointer"
-                    onClick={() => onEdit(post)}
-                  >
-                    <div className="h-12 w-16 flex-shrink-0 overflow-hidden rounded bg-muted">
-                      <img
-                        src={post.coverImage || blogPlaceholder}
-                        alt={post.title}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm text-foreground truncate">
-                        {post.title}
-                      </p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {post.excerpt}
-                      </p>
-                    </div>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       )}
 
