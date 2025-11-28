@@ -62,31 +62,43 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProper
   
   // Mouse drag scroll state
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
+  const isMouseDown = useRef(false);
+  const startX = useRef(0);
+  const scrollLeftRef = useRef(0);
+  const hasDragged = useRef(false);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    // Only start drag if clicking on the container itself or cards, not buttons
+    const target = e.target as HTMLElement;
+    if (target.closest('button')) return;
+    
     if (!scrollContainerRef.current) return;
-    setIsDragging(true);
-    setStartX(e.pageX - scrollContainerRef.current.offsetLeft);
-    setScrollLeft(scrollContainerRef.current.scrollLeft);
+    isMouseDown.current = true;
+    hasDragged.current = false;
+    startX.current = e.pageX - scrollContainerRef.current.offsetLeft;
+    scrollLeftRef.current = scrollContainerRef.current.scrollLeft;
   }, []);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!isDragging || !scrollContainerRef.current) return;
-    e.preventDefault();
+    if (!isMouseDown.current || !scrollContainerRef.current) return;
+    
     const x = e.pageX - scrollContainerRef.current.offsetLeft;
-    const walk = (x - startX) * 1.5;
-    scrollContainerRef.current.scrollLeft = scrollLeft - walk;
-  }, [isDragging, startX, scrollLeft]);
+    const walk = (x - startX.current) * 1.5;
+    
+    // Only consider it a drag if moved more than 5px
+    if (Math.abs(walk) > 5) {
+      hasDragged.current = true;
+      e.preventDefault();
+      scrollContainerRef.current.scrollLeft = scrollLeftRef.current - walk;
+    }
+  }, []);
 
   const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
+    isMouseDown.current = false;
   }, []);
 
   const handleMouseLeave = useCallback(() => {
-    setIsDragging(false);
+    isMouseDown.current = false;
   }, []);
   
   // Form state for properties dialog
@@ -227,7 +239,7 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProper
       ) : (
         <div 
           ref={scrollContainerRef}
-          className={`overflow-x-auto pb-4 -mx-4 px-4 select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+          className="overflow-x-auto pb-4 -mx-4 px-4 select-none cursor-grab active:cursor-grabbing"
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
