@@ -25,11 +25,21 @@ const sitesSubItems = [
 export const DashboardSidebar = () => {
   const location = useLocation();
   const [sitesOpen, setSitesOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const isSitesActive = location.pathname.startsWith("/sites");
 
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setSitesOpen(false);
+  };
+
   return (
-    <aside className="group fixed bottom-4 left-4 top-20 z-40 w-[67px] rounded-2xl bg-slate-800 transition-all duration-300 hover:w-56">
+    <aside 
+      className="group fixed bottom-4 left-4 top-20 z-40 w-[67px] rounded-2xl bg-slate-800 transition-all duration-300 hover:w-56"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={handleMouseLeave}
+    >
       <nav className="mt-2 p-3">
         {/* Dashboard */}
         <NavLink
@@ -58,7 +68,7 @@ export const DashboardSidebar = () => {
             </span>
             <ChevronDown className={`h-4 w-4 shrink-0 opacity-0 transition-all duration-300 group-hover:opacity-100 ${sitesOpen ? "rotate-180" : ""}`} />
           </CollapsibleTrigger>
-          <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+          <CollapsibleContent className={`overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down ${!isHovered ? 'hidden' : ''}`}>
             <div className="ml-4 mt-1 space-y-1 border-l border-gray-600 pl-2">
               {sitesSubItems.map((item) => {
                 const isActive = location.pathname === item.url;
