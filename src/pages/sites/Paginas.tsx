@@ -483,7 +483,7 @@ const Paginas = () => {
                                                                         </div>
                                                                         <div className="flex-1 space-y-2">
                                                                             <div className="flex items-center gap-2">
-                                                                                <Input type="file" accept="image/*" onChange={e => handleImageUpload(e, "imageUrl")} className="text-sm file:mr-4 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 my-0 py-[2px]" />
+                                                                                <Input type="file" accept="image/*" onChange={e => handleImageUpload(e, "imageUrl")} className="text-sm file:mr-4 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 my-0 py-[8px]" />
                                                                             </div>
                                                                             <p className="text-xs text-muted-foreground">
                                                                                 Recomendado: 1920x1080px (JPG, PNG)
