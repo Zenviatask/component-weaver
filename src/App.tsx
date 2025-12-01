@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import { PostEditorPage } from "./components/blog/PostEditorPage";
 import Perfis from "./pages/sites/Perfis";
 import Depoimentos from "./pages/sites/Depoimentos";
+import Paginas from "./pages/sites/Paginas";
 
 
 const queryClient = new QueryClient();
@@ -29,22 +30,23 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/sites" element={<Sites />} />
-            <Route path="/sites/perfis" element={<Perfis />} />
-            <Route path="/sites/depoimentos" element={<Depoimentos />} />
-            <Route path="/pages" element={<Pages />} />
-            <Route path="/widgets" element={<Widgets />} />
-            <Route path="/templates" element={<Templates />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/help" element={<Help />} />
-            <Route path="/posts/editor" element={<PostEditorPage />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/sites" element={<Sites />} />
+              <Route path="/sites/perfis" element={<Perfis />} />
+              <Route path="/sites/depoimentos" element={<Depoimentos />} />
+              <Route path="/sites/paginas" element={<Paginas />} />
+              <Route path="/pages" element={<Pages />} />
+              <Route path="/widgets" element={<Widgets />} />
+              <Route path="/templates" element={<Templates />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/help" element={<Help />} />
+              <Route path="/posts/editor" element={<PostEditorPage />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
   </>
