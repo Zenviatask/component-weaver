@@ -15,6 +15,7 @@ import Help from "./pages/Help";
 import NotFound from "./pages/NotFound";
 import { PostEditorPage } from "./components/blog/PostEditorPage";
 import Perfis from "./pages/sites/Perfis";
+import Depoimentos from "./pages/sites/Depoimentos";
 
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/sites" element={<Sites />} />
             <Route path="/sites/perfis" element={<Perfis />} />
+            <Route path="/sites/depoimentos" element={<Depoimentos />} />
             <Route path="/pages" element={<Pages />} />
             <Route path="/widgets" element={<Widgets />} />
             <Route path="/templates" element={<Templates />} />
