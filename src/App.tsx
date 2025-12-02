@@ -17,6 +17,7 @@ import { PostEditorPage } from "./components/blog/PostEditorPage";
 import Perfis from "./pages/sites/Perfis";
 import Depoimentos from "./pages/sites/Depoimentos";
 import Paginas from "./pages/sites/Paginas";
+import Galeria from "./pages/sites/Galeria";
 
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
               <Route path="/sites/perfis" element={<Perfis />} />
               <Route path="/sites/depoimentos" element={<Depoimentos />} />
               <Route path="/sites/paginas" element={<Paginas />} />
+              <Route path="/sites/galeria" element={<Galeria />} />
               <Route path="/pages" element={<Pages />} />
               <Route path="/widgets" element={<Widgets />} />
               <Route path="/templates" element={<Templates />} />
