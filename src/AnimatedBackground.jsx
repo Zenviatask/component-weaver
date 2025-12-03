@@ -142,7 +142,7 @@ export default function AnimatedBackground() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none"
-      style={{ background: 'transparent', zIndex: 1 }} // canvas sempre atrás do conteúdo
+      style={{ background: 'transparent', zIndex: 0 }} // canvas sempre atrás do conteúdo
     />
   );
 }
