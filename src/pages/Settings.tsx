@@ -31,6 +31,7 @@ import {
   FileEdit
 } from "lucide-react";
 import { toast } from "sonner";
+import { CategoriesProvider } from "@/contexts/CategoriesContext";
 
 interface SiteSettings {
   siteName: string;
@@ -214,7 +215,7 @@ const Settings = () => {
           <div className="space-y-6">
             <Accordion type="multiple" defaultValue={["basic", "contact", "location", "social"]} className="space-y-4">
               {/* Informações Básicas */}
-              <AccordionItem value="basic" className="border rounded-xl bg-white px-4 shadow-sm">
+              <AccordionItem value="basic" className="border rounded-xl bg-white/80 backdrop-blur-sm px-4 shadow-sm">
                 <AccordionTrigger className="hover:no-underline py-4">
                   <div className="flex items-center gap-2 text-slate-800">
                     <Building2 className="h-5 w-5 text-blue-500" />
@@ -280,7 +281,7 @@ const Settings = () => {
               </AccordionItem>
 
               {/* Informações de Contato */}
-              <AccordionItem value="contact" className="border rounded-xl bg-white px-4 shadow-sm">
+              <AccordionItem value="contact" className="border rounded-xl bg-white/80 backdrop-blur-sm px-4 shadow-sm">
                 <AccordionTrigger className="hover:no-underline py-4">
                   <div className="flex items-center gap-2 text-slate-800">
                     <Phone className="h-5 w-5 text-green-500" />
@@ -331,7 +332,7 @@ const Settings = () => {
               </AccordionItem>
 
               {/* Localização */}
-              <AccordionItem value="location" className="border rounded-xl bg-white px-4 shadow-sm">
+              <AccordionItem value="location" className="border rounded-xl bg-white/80 backdrop-blur-sm px-4 shadow-sm">
                 <AccordionTrigger className="hover:no-underline py-4">
                   <div className="flex items-center gap-2 text-slate-800">
                     <MapPin className="h-5 w-5 text-red-500" />
@@ -405,7 +406,7 @@ const Settings = () => {
               </AccordionItem>
 
               {/* Redes Sociais */}
-              <AccordionItem value="social" className="border rounded-xl bg-white px-4 shadow-sm">
+              <AccordionItem value="social" className="border rounded-xl bg-white/80 backdrop-blur-sm px-4 shadow-sm">
                 <AccordionTrigger className="hover:no-underline py-4">
                   <div className="flex items-center gap-2 text-slate-800">
                     <Globe className="h-5 w-5 text-purple-500" />
