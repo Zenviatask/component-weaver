@@ -22,6 +22,9 @@ import {
   Trash2,
   Filter,
   Quote,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
 } from "lucide-react";
 
 interface Testimonial {
@@ -30,6 +33,8 @@ interface Testimonial {
   descricaoHtml: string; // texto com tags HTML
   foto: string;
 }
+
+const ITEMS_PER_PAGE = 8;
 
 const Depoimentos = () => {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
@@ -47,6 +52,8 @@ const Depoimentos = () => {
   const [filterNome, setFilterNome] = useState("");
   const [filterTexto, setFilterTexto] = useState("");
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -71,6 +78,7 @@ const Depoimentos = () => {
   const clearFilters = () => {
     setFilterNome("");
     setFilterTexto("");
+    setCurrentPage(1);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -139,6 +147,16 @@ const Depoimentos = () => {
     });
   }, [testimonials, filterNome, filterTexto]);
 
+  const totalPages = Math.ceil(filteredTestimonials.length / ITEMS_PER_PAGE);
+  const paginatedTestimonials = filteredTestimonials.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   return (
     <DashboardLayout>
       <div className="p-4 lg:p-6 relative z-10">
@@ -152,6 +170,57 @@ const Depoimentos = () => {
           </div>
 
           <div className="flex gap-2">
+            <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="gap-2 border-blue-200 text-blue-700 hover:bg-blue-50"
+                >
+                  <Eye className="h-4 w-4" />
+                  Pré-visualizar
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-0 gap-0 bg-white">
+                <div className="sticky top-0 z-50 flex items-center justify-between border-b bg-white/95 px-6 py-4 backdrop-blur">
+                  <DialogTitle>Pré-visualização do Site</DialogTitle>
+                  <div className="flex gap-2">
+                    <div className="h-3 w-3 rounded-full bg-red-500" />
+                    <div className="h-3 w-3 rounded-full bg-yellow-500" />
+                    <div className="h-3 w-3 rounded-full bg-green-500" />
+                  </div>
+                </div>
+                <div className="p-8 bg-slate-50 min-h-[500px]">
+                  <div className="max-w-6xl mx-auto">
+                    <h2 className="text-3xl font-bold text-center mb-8 text-slate-900">
+                      O que dizem nossos clientes
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                      {testimonials.map((testimonial) => (
+                        <div key={testimonial.id} className="bg-white p-6 rounded-xl shadow-md">
+                          <div className="flex items-center gap-4 mb-4">
+                            <div className="h-12 w-12 rounded-full bg-gray-200 overflow-hidden">
+                              {testimonial.foto ? (
+                                <img src={testimonial.foto} alt={testimonial.nome} className="h-full w-full object-cover" />
+                              ) : (
+                                <User className="h-full w-full p-2 text-gray-400" />
+                              )}
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-slate-900">{testimonial.nome}</h4>
+                            </div>
+                          </div>
+                          <div
+                            className="text-slate-600 text-sm italic"
+                            dangerouslySetInnerHTML={{ __html: testimonial.descricaoHtml }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
             {/* Botão Filtros */}
             <Dialog
               open={isFilterDialogOpen}
@@ -364,73 +433,102 @@ const Depoimentos = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filteredTestimonials.map((testimonial) => (
-              <Card
-                key={testimonial.id}
-                className="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-md flex flex-col px-6 pt-10 pb-6 relative"
-              >
-                {/* Ícone de aspas */}
-                <div className="absolute top-4 left-4 text-blue-100 group-hover:text-blue-200 transition-colors">
-                  <Quote className="h-8 w-8" />
-                </div>
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {paginatedTestimonials.map((testimonial) => (
+                <Card
+                  key={testimonial.id}
+                  className="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-md flex flex-col px-6 pt-10 pb-6 relative"
+                >
+                  {/* Ícone de aspas */}
+                  <div className="absolute top-4 left-4 text-blue-100 group-hover:text-blue-200 transition-colors">
+                    <Quote className="h-8 w-8" />
+                  </div>
 
-                {/* Avatar maior */}
-                <div className="flex flex-col items-center">
-                  <div className="h-32 w-32 rounded-full border-4 border-blue-50 bg-gray-100 overflow-hidden shadow-sm mb-4">
-                    {testimonial.foto ? (
-                      <img
-                        src={testimonial.foto}
-                        alt={testimonial.nome}
-                        className="h-full w-full object-cover"
+                  {/* Avatar maior */}
+                  <div className="flex flex-col items-center">
+                    <div className="h-32 w-32 rounded-full border-4 border-blue-50 bg-gray-100 overflow-hidden shadow-sm mb-4">
+                      {testimonial.foto ? (
+                        <img
+                          src={testimonial.foto}
+                          alt={testimonial.nome}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-gray-200">
+                          <User className="h-10 w-10 text-gray-400" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Conteúdo do depoimento */}
+                  <div className="mt-2 flex-1 flex flex-col items-center text-center">
+                    <div className="text-sm text-slate-700 italic max-w-xs">
+                      <div
+                        className="prose prose-sm max-w-none prose-p:mb-1 prose-headings:mb-1"
+                        dangerouslySetInnerHTML={{
+                          __html: testimonial.descricaoHtml,
+                        }}
                       />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-gray-200">
-                        <User className="h-10 w-10 text-gray-400" />
-                      </div>
-                    )}
-                  </div>
-                </div>
+                    </div>
 
-                {/* Conteúdo do depoimento */}
-                <div className="mt-2 flex-1 flex flex-col items-center text-center">
-                  <div className="text-sm text-slate-700 italic max-w-xs">
-                    <div
-                      className="prose prose-sm max-w-none prose-p:mb-1 prose-headings:mb-1"
-                      dangerouslySetInnerHTML={{
-                        __html: testimonial.descricaoHtml,
-                      }}
-                    />
+                    <div className="mt-4">
+                      <p className="font-semibold text-slate-900">
+                        {testimonial.nome}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="mt-4">
-                    <p className="font-semibold text-slate-900">
-                      {testimonial.nome}
-                    </p>
+                  {/* Actions */}
+                  <div className="absolute top-3 right-3 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 bg-white/80 hover:bg-white text-slate-700"
+                      onClick={() => handleEdit(testimonial)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 bg-white/80 hover:bg-red-50 text-red-500"
+                      onClick={() => handleDelete(testimonial.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                </div>
+                </Card>
+              ))}
+            </div>
 
-                {/* Actions */}
-                <div className="absolute top-3 right-3 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-8 w-8 bg-white/80 hover:bg-white text-slate-700"
-                    onClick={() => handleEdit(testimonial)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-8 w-8 bg-white/80 hover:bg-red-50 text-red-500"
-                    onClick={() => handleDelete(testimonial.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </Card>
-            ))}
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-8">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="h-8 w-8"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <span className="text-sm text-slate-600">
+                  Página {currentPage} de {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="h-8 w-8"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </div>

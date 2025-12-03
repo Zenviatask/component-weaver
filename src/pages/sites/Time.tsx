@@ -13,7 +13,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { PageHeader, EmptyState, GlassCard, FilterButton, PrimaryButton, ImageUploader } from "@/components/shared";
-import { Plus, Pencil, Trash2, Users, User, Briefcase, Mail } from "lucide-react";
+import { Plus, Pencil, Trash2, Users, User, Briefcase, Mail, Eye } from "lucide-react";
 import { toast } from "sonner";
 
 interface Membro {
@@ -39,6 +39,7 @@ const Time = () => {
 
   const [filterNome, setFilterNome] = useState("");
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -116,6 +117,52 @@ const Time = () => {
     <DashboardLayout>
       <div className="p-4 lg:p-6 relative z-10">
         <PageHeader title="Time" description="Gerencie os membros da equipe">
+          <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+            <DialogTrigger asChild>
+              <Button
+                variant="outline"
+                className="gap-2 border-blue-200 text-blue-700 hover:bg-blue-50"
+              >
+                <Eye className="h-4 w-4" />
+                Pré-visualizar
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-0 gap-0 bg-white">
+              <div className="sticky top-0 z-50 flex items-center justify-between border-b bg-white/95 px-6 py-4 backdrop-blur">
+                <DialogTitle>Pré-visualização do Site</DialogTitle>
+                <div className="flex gap-2">
+                  <div className="h-3 w-3 rounded-full bg-red-500" />
+                  <div className="h-3 w-3 rounded-full bg-yellow-500" />
+                  <div className="h-3 w-3 rounded-full bg-green-500" />
+                </div>
+              </div>
+              <div className="p-8 bg-slate-50 min-h-[500px]">
+                <div className="max-w-6xl mx-auto">
+                  <h2 className="text-3xl font-bold text-center mb-8 text-slate-900">
+                    Nossa Equipe
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {membros.map((membro) => (
+                      <div key={membro.id} className="bg-white p-6 rounded-xl shadow-md text-center">
+                        <div className="h-32 w-32 mx-auto mb-4 rounded-full bg-gray-200 overflow-hidden border-4 border-blue-100">
+                          {membro.foto ? (
+                            <img src={membro.foto} alt={membro.nome} className="h-full w-full object-cover" />
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center bg-gray-100">
+                              <User className="h-12 w-12 text-gray-400" />
+                            </div>
+                          )}
+                        </div>
+                        <h4 className="text-xl font-bold text-slate-900">{membro.nome}</h4>
+                        <p className="text-blue-600 font-medium mb-2">{membro.cargo}</p>
+                        <p className="text-slate-600 text-sm">{membro.bio}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
           <Dialog open={isFilterDialogOpen} onOpenChange={setIsFilterDialogOpen}>
             <DialogTrigger asChild>
               <FilterButton />

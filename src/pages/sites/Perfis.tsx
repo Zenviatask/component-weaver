@@ -29,6 +29,7 @@ import {
   Pencil,
   Trash2,
   Filter,
+  Eye,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -67,6 +68,7 @@ const Perfis = () => {
   // "" = sem filtro de tipo
   const [filterTipo, setFilterTipo] = useState("");
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -179,6 +181,57 @@ const Perfis = () => {
           </div>
 
           <div className="flex gap-2">
+            <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="gap-2 border-blue-200 text-blue-700 hover:bg-blue-50"
+                >
+                  <Eye className="h-4 w-4" />
+                  Pré-visualizar
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-0 gap-0 bg-white">
+                <div className="sticky top-0 z-50 flex items-center justify-between border-b bg-white/95 px-6 py-4 backdrop-blur">
+                  <DialogTitle>Pré-visualização do Site</DialogTitle>
+                  <div className="flex gap-2">
+                    <div className="h-3 w-3 rounded-full bg-red-500" />
+                    <div className="h-3 w-3 rounded-full bg-yellow-500" />
+                    <div className="h-3 w-3 rounded-full bg-green-500" />
+                  </div>
+                </div>
+                <div className="p-8 bg-slate-50 min-h-[500px]">
+                  <div className="max-w-6xl mx-auto">
+                    <h2 className="text-3xl font-bold text-center mb-8 text-slate-900">
+                      Nossa Equipe
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                      {profiles.map((profile) => (
+                        <div key={profile.id} className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow text-center">
+                          <div className="h-32 bg-gradient-to-r from-blue-500 to-purple-600 relative">
+                            <div className="absolute -bottom-10 left-1/2 -translate-x-1/2">
+                              <div className="h-20 w-20 rounded-full border-4 border-white overflow-hidden bg-gray-200">
+                                {profile.foto ? (
+                                  <img src={profile.foto} alt={profile.nome} className="h-full w-full object-cover" />
+                                ) : (
+                                  <User className="h-full w-full p-4 text-gray-400" />
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="pt-12 pb-6 px-4">
+                            <h3 className="font-bold text-slate-900 text-lg">{profile.nome}</h3>
+                            <p className="text-blue-600 font-medium text-sm mb-2">{profile.tipoPerfil}</p>
+                            <p className="text-slate-600 text-sm line-clamp-3">{profile.descricao}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
             {/* Botão de filtros (abre modal) */}
             <Dialog
               open={isFilterDialogOpen}
