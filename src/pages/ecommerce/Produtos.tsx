@@ -6,9 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Search, Edit, Trash2, Eye, X } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Eye, X, ShoppingCart } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 interface Product {
   id: string;
@@ -58,7 +59,9 @@ const Produtos = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isProductPreviewOpen, setIsProductPreviewOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [previewProduct, setPreviewProduct] = useState<Product | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -115,6 +118,11 @@ const Produtos = () => {
     setIsDialogOpen(true);
   };
 
+  const clearFilters = () => {
+    setSearchTerm("");
+    setFilterCategory("all");
+  };
+
   const handleSave = () => {
     if (editingProduct) {
       setProducts(products.map((p) =>
@@ -132,7 +140,7 @@ const Produtos = () => {
 
   const handlePreview = (product: Product) => {
     setPreviewProduct(product);
-    setIsPreviewOpen(true);
+    setIsProductPreviewOpen(true);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -196,55 +204,132 @@ const Produtos = () => {
   return (
     <DashboardLayout>
       <PageHeader title="Produtos" description="Gerencie seus produtos do e-commerce">
-        <FilterButton />
-        <Button variant="outline" onClick={() => filteredProducts[0] && handlePreview(filteredProducts[0])}>
-          <Eye className="h-4 w-4" />
-          Pré-visualizar
-        </Button>
+        <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="gap-2 border-blue-200 text-blue-700 hover:bg-blue-50">
+              <Eye className="h-4 w-4" />
+              Pré-visualizar
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-0 gap-0 bg-white">
+            <div className="sticky top-0 z-50 flex items-center justify-between border-b bg-white/95 px-6 py-4 backdrop-blur">
+              <DialogTitle>Pré-visualização do Site</DialogTitle>
+              <div className="flex gap-2">
+                <div className="h-3 w-3 rounded-full bg-red-500" />
+                <div className="h-3 w-3 rounded-full bg-yellow-500" />
+                <div className="h-3 w-3 rounded-full bg-green-500" />
+              </div>
+            </div>
+            <div className="p-8 bg-slate-50 min-h-[500px]">
+              <div className="max-w-6xl mx-auto">
+                <h2 className="text-3xl font-bold text-center mb-8 text-slate-900">
+                  Nossos Produtos
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {filteredProducts.map((product) => (
+                    <div key={product.id} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow group">
+                      <div className="aspect-square bg-gray-100 relative overflow-hidden">
+                        {product.imageUrl ? (
+                          <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-4xl">📦</div>
+                        )}
+                        {product.quantity === 0 && (
+                          <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
+                            <span className="bg-black text-white px-3 py-1 text-sm font-medium rounded-full">Esgotado</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-4">
+                        <div className="text-xs text-blue-600 font-medium mb-1">{product.category}</div>
+                        <h3 className="font-semibold text-slate-800 mb-1 truncate">{product.name}</h3>
+                        <p className="text-slate-500 text-sm line-clamp-2 mb-3 h-10">{product.description}</p>
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-lg text-slate-900">R$ {product.price.toFixed(2)}</span>
+                          <Button size="icon" className="h-8 w-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white">
+                            <ShoppingCart className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isFilterDialogOpen} onOpenChange={setIsFilterDialogOpen}>
+          <DialogTrigger asChild>
+            <FilterButton />
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[480px] bg-white/95 backdrop-blur-md">
+            <DialogHeader>
+              <DialogTitle className="text-slate-800">Filtrar Produtos</DialogTitle>
+            </DialogHeader>
+            <div className="mt-4 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="search">Buscar</Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="search"
+                    placeholder="Buscar produtos..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Categoria</Label>
+                <Select value={filterCategory} onValueChange={setFilterCategory}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione a categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas categorias</SelectItem>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-between gap-3">
+              <Button type="button" variant="outline" onClick={clearFilters}>
+                Limpar filtros
+              </Button>
+              <div className="flex gap-2">
+                <DialogClose asChild>
+                  <Button type="button" variant="outline">Fechar</Button>
+                </DialogClose>
+                <DialogClose asChild>
+                  <PrimaryButton>Aplicar</PrimaryButton>
+                </DialogClose>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
         <PrimaryButton onClick={() => handleOpenDialog()}>
           <Plus className="h-4 w-4" />
           Novo Produto
         </PrimaryButton>
       </PageHeader>
 
-      {/* Search and Filter */}
-      <GlassCard className="p-4 mb-6">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Buscar produtos..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <Select value={filterCategory} onValueChange={setFilterCategory}>
-            <SelectTrigger className="w-full sm:w-48">
-              <SelectValue placeholder="Categoria" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas categorias</SelectItem>
-              {categories.map((cat) => (
-                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </GlassCard>
-
       {/* Products List */}
       <div className="grid gap-4">
         {filteredProducts.map((product, index) => (
-          <GlassCard
+          <Card
             key={product.id}
-            className="p-6"
+            className="bg-white/50 backdrop-blur-sm border-slate-200 shadow-sm hover:shadow-md transition-all"
             draggable
             onDragStart={() => handleDragStart(index)}
             onDragOver={(e) => handleDragOver(e, index)}
             onDragEnd={handleDragEnd}
           >
-            <div className="flex items-center gap-6">
+            <CardContent className="p-6 flex items-center gap-6">
               <div className="h-24 w-24 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
                 {product.imageUrl ? (
                   <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
@@ -289,15 +374,15 @@ const Produtos = () => {
                 </Button>
                 <DragHandle />
               </div>
-            </div>
-          </GlassCard>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
       {filteredProducts.length === 0 && (
-        <GlassCard className="p-12 text-center">
+        <div className="p-12 text-center bg-white rounded-xl border border-dashed border-slate-300">
           <p className="text-muted-foreground">Nenhum produto encontrado</p>
-        </GlassCard>
+        </div>
       )}
 
       {/* Create/Edit Dialog */}
@@ -446,7 +531,7 @@ const Produtos = () => {
       </Dialog>
 
       {/* Preview Dialog */}
-      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+      <Dialog open={isProductPreviewOpen} onOpenChange={setIsProductPreviewOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Pré-visualização</DialogTitle>
