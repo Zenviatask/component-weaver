@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { PageHeader, GlassCard, FilterButton, PrimaryButton } from "@/components/shared";
+import { PageHeader, GlassCard, FilterButton, PrimaryButton, DragHandle, ImageUploader } from "@/components/shared";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,8 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Search, Edit, Trash2, Eye, GripVertical, X } from "lucide-react";
-import { ImageUploader } from "@/components/shared/ImageUploader";
+import { Plus, Search, Edit, Trash2, Eye, X } from "lucide-react";
 
 interface Product {
   id: string;
@@ -25,7 +24,7 @@ interface Product {
 }
 
 const categories = ["Eletrônicos", "Roupas", "Acessórios", "Casa", "Esportes", "Outros"];
-const availableColors = ["Preto", "Branco", "Azul", "Vermelho", "Verde", "Amarelo", "Rosa", "Cinza"];
+const defaultColors = ["Preto", "Branco", "Azul", "Vermelho", "Verde", "Amarelo", "Rosa", "Cinza"];
 const availableSizes = ["PP", "P", "M", "G", "GG", "XG"];
 
 const Produtos = () => {
@@ -63,6 +62,8 @@ const Produtos = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [previewProduct, setPreviewProduct] = useState<Product | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [availableColors, setAvailableColors] = useState<string[]>(defaultColors);
+  const [newColorInput, setNewColorInput] = useState("");
 
   const [formData, setFormData] = useState<Omit<Product, "id">>({
     name: "",
@@ -163,6 +164,15 @@ const Produtos = () => {
     });
   };
 
+  const handleAddNewColor = () => {
+    const trimmedColor = newColorInput.trim();
+    if (trimmedColor && !availableColors.includes(trimmedColor)) {
+      setAvailableColors([...availableColors, trimmedColor]);
+      setFormData({ ...formData, colors: [...formData.colors, trimmedColor] });
+      setNewColorInput("");
+    }
+  };
+
   const handleDragStart = (index: number) => {
     setDraggedIndex(index);
   };
@@ -187,6 +197,10 @@ const Produtos = () => {
     <DashboardLayout>
       <PageHeader title="Produtos" description="Gerencie seus produtos do e-commerce">
         <FilterButton />
+        <Button variant="outline" onClick={() => filteredProducts[0] && handlePreview(filteredProducts[0])}>
+          <Eye className="h-4 w-4" />
+          Pré-visualizar
+        </Button>
         <PrimaryButton onClick={() => handleOpenDialog()}>
           <Plus className="h-4 w-4" />
           Novo Produto
@@ -224,29 +238,25 @@ const Produtos = () => {
         {filteredProducts.map((product, index) => (
           <GlassCard
             key={product.id}
-            className="p-4"
+            className="p-6"
             draggable
             onDragStart={() => handleDragStart(index)}
             onDragOver={(e) => handleDragOver(e, index)}
             onDragEnd={handleDragEnd}
           >
-            <div className="flex items-center gap-4">
-              <div className="cursor-grab text-gray-400 hover:text-gray-600">
-                <GripVertical className="h-5 w-5" />
-              </div>
-              
-              <div className="h-16 w-16 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
+            <div className="flex items-center gap-6">
+              <div className="h-24 w-24 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
                 {product.imageUrl ? (
                   <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
                 ) : (
-                  <span className="text-2xl">📦</span>
+                  <span className="text-4xl">📦</span>
                 )}
               </div>
 
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-slate-800 truncate">{product.name}</h3>
-                <p className="text-sm text-muted-foreground truncate">{product.description}</p>
-                <div className="flex flex-wrap gap-2 mt-1">
+                <h3 className="font-semibold text-lg text-slate-800 truncate">{product.name}</h3>
+                <p className="text-sm text-muted-foreground truncate mt-1">{product.description}</p>
+                <div className="flex flex-wrap gap-2 mt-2">
                   <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-600">
                     {product.category}
                   </span>
@@ -261,21 +271,23 @@ const Produtos = () => {
                 </div>
               </div>
 
-              <div className="text-right shrink-0">
-                <p className="font-bold text-lg text-slate-800">
+              <div className="flex flex-col items-center justify-center shrink-0">
+                <p className="font-bold text-xl text-slate-800">
                   R$ {product.price.toFixed(2)}
                 </p>
-                <div className="flex gap-1 mt-2">
-                  <Button variant="ghost" size="icon" onClick={() => handlePreview(product)}>
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(product)}>
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={() => handleDelete(product.id)}>
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
-                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <Button variant="ghost" size="icon" onClick={() => handlePreview(product)}>
+                  <Eye className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(product)}>
+                  <Edit className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={() => handleDelete(product.id)}>
+                  <Trash2 className="h-4 w-4 text-red-500" />
+                </Button>
+                <DragHandle />
               </div>
             </div>
           </GlassCard>
@@ -377,6 +389,19 @@ const Produtos = () => {
                     {color}
                   </Button>
                 ))}
+              </div>
+              <div className="flex gap-2 mt-2">
+                <Input
+                  placeholder="Nova cor..."
+                  value={newColorInput}
+                  onChange={(e) => setNewColorInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddNewColor())}
+                  className="flex-1"
+                />
+                <Button type="button" variant="outline" size="sm" onClick={handleAddNewColor}>
+                  <Plus className="h-4 w-4 mr-1" />
+                  Adicionar
+                </Button>
               </div>
             </div>
 
