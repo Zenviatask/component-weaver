@@ -323,7 +323,7 @@ const Produtos = () => {
         {filteredProducts.map((product, index) => (
           <Card
             key={product.id}
-            className="bg-white/60 backdrop-blur-sm border-slate-200 shadow-sm hover:shadow-md transition-all"
+            className="bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm hover:shadow-md transition-all"
             draggable
             onDragStart={() => handleDragStart(index)}
             onDragOver={(e) => handleDragOver(e, index)}
