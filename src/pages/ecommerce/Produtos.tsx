@@ -202,7 +202,7 @@ const Produtos = () => {
   };
 
   return (
-    <DashboardLayout>
+    <DashboardLayout className="p-4 lg:p-6 relative z-10">
       <PageHeader title="Produtos" description="Gerencie seus produtos do e-commerce">
         <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
           <DialogTrigger asChild>
