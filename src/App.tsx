@@ -20,6 +20,8 @@ import Paginas from "./pages/sites/Paginas";
 import Galeria from "./pages/sites/Galeria";
 import Servicos from "./pages/sites/Servicos";
 import Time from "./pages/sites/Time";
+import Produtos from "./pages/ecommerce/Produtos";
+import Vendas from "./pages/ecommerce/Vendas";
 
 
 const queryClient = new QueryClient();
@@ -42,6 +44,8 @@ const App = () => (
               <Route path="/sites/galeria" element={<Galeria />} />
               <Route path="/sites/servicos" element={<Servicos />} />
               <Route path="/sites/time" element={<Time />} />
+              <Route path="/ecommerce/produtos" element={<Produtos />} />
+              <Route path="/ecommerce/vendas" element={<Vendas />} />
               <Route path="/pages" element={<Pages />} />
               <Route path="/widgets" element={<Widgets />} />
               <Route path="/templates" element={<Templates />} />
