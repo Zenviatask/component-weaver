@@ -22,6 +22,7 @@ import Servicos from "./pages/sites/Servicos";
 import Time from "./pages/sites/Time";
 import Produtos from "./pages/ecommerce/Produtos";
 import Vendas from "./pages/ecommerce/Vendas";
+import { CategoriesProvider } from "./contexts/CategoriesContext";
 
 
 const queryClient = new QueryClient();
@@ -32,30 +33,32 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
         <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/sites" element={<Sites />} />
-              <Route path="/sites/perfis" element={<Perfis />} />
-              <Route path="/sites/depoimentos" element={<Depoimentos />} />
-              <Route path="/sites/paginas" element={<Paginas />} />
-              <Route path="/sites/galeria" element={<Galeria />} />
-              <Route path="/sites/servicos" element={<Servicos />} />
-              <Route path="/sites/time" element={<Time />} />
-              <Route path="/ecommerce/produtos" element={<Produtos />} />
-              <Route path="/ecommerce/vendas" element={<Vendas />} />
-              <Route path="/pages" element={<Pages />} />
-              <Route path="/widgets" element={<Widgets />} />
-              <Route path="/templates" element={<Templates />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/help" element={<Help />} />
-              <Route path="/posts/editor" element={<PostEditorPage />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
+          <CategoriesProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/sites" element={<Sites />} />
+                <Route path="/sites/perfis" element={<Perfis />} />
+                <Route path="/sites/depoimentos" element={<Depoimentos />} />
+                <Route path="/sites/paginas" element={<Paginas />} />
+                <Route path="/sites/galeria" element={<Galeria />} />
+                <Route path="/sites/servicos" element={<Servicos />} />
+                <Route path="/sites/time" element={<Time />} />
+                <Route path="/ecommerce/produtos" element={<Produtos />} />
+                <Route path="/ecommerce/vendas" element={<Vendas />} />
+                <Route path="/pages" element={<Pages />} />
+                <Route path="/widgets" element={<Widgets />} />
+                <Route path="/templates" element={<Templates />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/help" element={<Help />} />
+                <Route path="/posts/editor" element={<PostEditorPage />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </CategoriesProvider>
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
