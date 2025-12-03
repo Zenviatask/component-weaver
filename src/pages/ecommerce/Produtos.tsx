@@ -323,14 +323,14 @@ const Produtos = () => {
         {filteredProducts.map((product, index) => (
           <Card
             key={product.id}
-            className="bg-white/60 backdrop-blur-md border-slate-200 shadow-sm hover:shadow-md transition-all"
+            className="bg-white/60 backdrop-blur-sm border-slate-200 shadow-sm hover:shadow-md transition-all"
             draggable
             onDragStart={() => handleDragStart(index)}
             onDragOver={(e) => handleDragOver(e, index)}
             onDragEnd={handleDragEnd}
           >
             <CardContent className="p-6 flex items-center gap-6">
-              <div className="h-24 w-24 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
+              <div className="h-28 w-28 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
                 {product.imageUrl ? (
                   <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
                 ) : (
@@ -363,9 +363,6 @@ const Produtos = () => {
               </div>
 
               <div className="flex items-center gap-2 shrink-0">
-                <Button variant="ghost" size="icon" onClick={() => handlePreview(product)}>
-                  <Eye className="h-4 w-4" />
-                </Button>
                 <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(product)}>
                   <Edit className="h-4 w-4" />
                 </Button>
