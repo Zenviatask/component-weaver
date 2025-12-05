@@ -8,7 +8,7 @@ const navItems = [
   { title: "Dashboard", icon: LayoutDashboard, url: "/" },
   { title: "Blog", icon: FileText, url: "/pages" },
   { title: "Widgets", icon: Sparkles, url: "/widgets" },
-  { title: "Templates", icon: LayoutTemplate, url: "/templates" },
+  { title: "Usuários", icon: Users, url: "/usuarios" },
   { title: "Configurações", icon: Settings, url: "/settings" },
   { title: "Ajuda", icon: HelpCircle, url: "/help" },
 ];
@@ -43,7 +43,7 @@ export const DashboardSidebar = () => {
   };
 
   return (
-    <aside 
+    <aside
       className="group fixed bottom-4 left-4 top-20 z-40 w-[67px] rounded-2xl bg-slate-800 transition-all duration-300 hover:w-56"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
@@ -53,9 +53,8 @@ export const DashboardSidebar = () => {
         <NavLink
           to="/"
           end
-          className={`flex h-12 items-center gap-3 rounded-xl px-3 text-gray-400 transition-colors duration-200 hover:bg-white/5 hover:text-white ${
-            location.pathname === "/" ? "bg-blue-500/20 !text-blue-400" : ""
-          }`}
+          className={`flex h-12 items-center gap-3 rounded-xl px-3 text-gray-400 transition-colors duration-200 hover:bg-white/5 hover:text-white ${location.pathname === "/" ? "bg-blue-500/20 !text-blue-400" : ""
+            }`}
         >
           <LayoutDashboard className="h-5 w-5 shrink-0" />
           <span className="whitespace-nowrap text-sm font-medium opacity-0 transition-opacity duration-300 group-hover:opacity-100">
@@ -66,9 +65,8 @@ export const DashboardSidebar = () => {
         {/* Sites with submenu */}
         <Collapsible open={sitesOpen} onOpenChange={setSitesOpen} className="mt-1">
           <CollapsibleTrigger
-            className={`flex h-12 w-full items-center gap-3 rounded-xl px-3 text-gray-400 transition-colors duration-200 hover:bg-white/5 hover:text-white ${
-              isSitesActive ? "bg-blue-500/20 !text-blue-400" : ""
-            }`}
+            className={`flex h-12 w-full items-center gap-3 rounded-xl px-3 text-gray-400 transition-colors duration-200 hover:bg-white/5 hover:text-white ${isSitesActive ? "bg-blue-500/20 !text-blue-400" : ""
+              }`}
           >
             <Globe className="h-5 w-5 shrink-0" />
             <span className="whitespace-nowrap text-sm font-medium opacity-0 transition-opacity duration-300 group-hover:opacity-100 flex-1 text-left">
@@ -85,9 +83,8 @@ export const DashboardSidebar = () => {
                     key={item.title}
                     to={item.url}
                     end
-                    className={`flex h-10 items-center gap-3 rounded-xl px-3 text-gray-400 transition-colors duration-200 hover:bg-white/5 hover:text-white ${
-                      isActive ? "bg-blue-500/20 !text-blue-400" : ""
-                    }`}
+                    className={`flex h-10 items-center gap-3 rounded-xl px-3 text-gray-400 transition-colors duration-200 hover:bg-white/5 hover:text-white ${isActive ? "bg-blue-500/20 !text-blue-400" : ""
+                      }`}
                   >
                     <item.icon className="h-4 w-4 shrink-0" />
                     <span className="whitespace-nowrap text-xs font-medium opacity-0 transition-opacity duration-300 group-hover:opacity-100">
@@ -103,9 +100,8 @@ export const DashboardSidebar = () => {
         {/* E-commerce with submenu */}
         <Collapsible open={ecommerceOpen} onOpenChange={setEcommerceOpen} className="mt-1">
           <CollapsibleTrigger
-            className={`flex h-12 w-full items-center gap-3 rounded-xl px-3 text-gray-400 transition-colors duration-200 hover:bg-white/5 hover:text-white ${
-              isEcommerceActive ? "bg-blue-500/20 !text-blue-400" : ""
-            }`}
+            className={`flex h-12 w-full items-center gap-3 rounded-xl px-3 text-gray-400 transition-colors duration-200 hover:bg-white/5 hover:text-white ${isEcommerceActive ? "bg-blue-500/20 !text-blue-400" : ""
+              }`}
           >
             <ShoppingCart className="h-5 w-5 shrink-0" />
             <span className="whitespace-nowrap text-sm font-medium opacity-0 transition-opacity duration-300 group-hover:opacity-100 flex-1 text-left">
@@ -122,9 +118,8 @@ export const DashboardSidebar = () => {
                     key={item.title}
                     to={item.url}
                     end
-                    className={`flex h-10 items-center gap-3 rounded-xl px-3 text-gray-400 transition-colors duration-200 hover:bg-white/5 hover:text-white ${
-                      isActive ? "bg-blue-500/20 !text-blue-400" : ""
-                    }`}
+                    className={`flex h-10 items-center gap-3 rounded-xl px-3 text-gray-400 transition-colors duration-200 hover:bg-white/5 hover:text-white ${isActive ? "bg-blue-500/20 !text-blue-400" : ""
+                      }`}
                   >
                     <item.icon className="h-4 w-4 shrink-0" />
                     <span className="whitespace-nowrap text-xs font-medium opacity-0 transition-opacity duration-300 group-hover:opacity-100">
@@ -145,9 +140,8 @@ export const DashboardSidebar = () => {
               key={item.title}
               to={item.url}
               end
-              className={`flex h-12 items-center gap-3 rounded-xl px-3 text-gray-400 transition-colors duration-200 hover:bg-white/5 hover:text-white mt-1 ${
-                isActive ? "bg-blue-500/20 !text-blue-400" : ""
-              }`}
+              className={`flex h-12 items-center gap-3 rounded-xl px-3 text-gray-400 transition-colors duration-200 hover:bg-white/5 hover:text-white mt-1 ${isActive ? "bg-blue-500/20 !text-blue-400" : ""
+                }`}
             >
               <item.icon className="h-5 w-5 shrink-0" />
               <span className="whitespace-nowrap text-sm font-medium opacity-0 transition-opacity duration-300 group-hover:opacity-100">

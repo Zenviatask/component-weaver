@@ -9,7 +9,7 @@ import Index from "./pages/Index";
 import Sites from "./pages/Sites";
 import Pages from "./pages/Pages";
 import Widgets from "./pages/Widgets";
-import Templates from "./pages/Templates";
+import Usuarios from "./pages/Usuarios";
 import Settings from "./pages/Settings";
 import Help from "./pages/Help";
 import NotFound from "./pages/NotFound";
@@ -50,7 +50,7 @@ const App = () => (
                 <Route path="/ecommerce/vendas" element={<Vendas />} />
                 <Route path="/pages" element={<Pages />} />
                 <Route path="/widgets" element={<Widgets />} />
-                <Route path="/templates" element={<Templates />} />
+                <Route path="/usuarios" element={<Usuarios />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/help" element={<Help />} />
                 <Route path="/posts/editor" element={<PostEditorPage />} />
