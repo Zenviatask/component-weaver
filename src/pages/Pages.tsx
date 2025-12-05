@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { BlogPostList, BlogPost } from "@/components/blog/BlogPostList";
-import { BlogPostForm } from "@/components/blog/BlogPostForm";
-import { StyleEditor } from "@/components/blog/StyleEditor";
+import { BlogPostList, BlogPost } from "@/pages/blog/BlogPostList";
+import { BlogPostForm } from "@/pages/blog/BlogPostForm";
+import { StyleEditor } from "@/pages/blog/StyleEditor";
 import { toast } from "sonner";
 
 const Pages = () => {
@@ -90,7 +90,7 @@ const Pages = () => {
     const newPosts = [newPost, ...posts];
     setPosts(newPosts);
     localStorage.setItem("blogPosts", JSON.stringify(newPosts));
-    
+
     setIsCreating(false);
     toast.success("Post criado! Redirecionando para o editor...");
     navigate("/posts/editor", { state: { post: newPost, isNew: true } });
@@ -116,7 +116,7 @@ const Pages = () => {
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto py-6 relative z-10 space-y-6">
+      <div className="p-4 lg:p-6 relative z-10 space-y-6">
         {isCreating ? (
           <BlogPostForm
             post={undefined}
@@ -132,7 +132,7 @@ const Pages = () => {
               onCreate={handleCreate}
               onUpdateProperties={handleUpdateProperties}
             />
-            
+
             <StyleEditor
               value={globalStyles}
               onChange={handleStylesChange}

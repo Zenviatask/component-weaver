@@ -13,7 +13,7 @@ import Templates from "./pages/Templates";
 import Settings from "./pages/Settings";
 import Help from "./pages/Help";
 import NotFound from "./pages/NotFound";
-import { PostEditorPage } from "./components/blog/PostEditorPage";
+import { PostEditorPage } from "./pages/blog/PostEditorPage";
 import Perfis from "./pages/sites/Perfis";
 import Depoimentos from "./pages/sites/Depoimentos";
 import Paginas from "./pages/sites/Paginas";

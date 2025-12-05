@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { Pencil, Trash2, Plus, MoreHorizontal, ChevronLeft, ChevronRight, Filter } from "lucide-react";
+import { PageHeader } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -140,8 +141,8 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProper
       const matchesAuthor = !authorTerm
         ? true
         : (post.authors ?? []).some((a) =>
-            a.toLowerCase().includes(authorTerm)
-          );
+          a.toLowerCase().includes(authorTerm)
+        );
 
       // Data do post (string livre, você pode trocar por date)
       const postDateTerm = filterPostDate.trim();
@@ -154,32 +155,32 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProper
       const matchesCategory = !categoryTerm
         ? true
         : (post.categories ?? []).some((c) =>
-            c.toLowerCase().includes(categoryTerm)
-          );
+          c.toLowerCase().includes(categoryTerm)
+        );
 
       // Tag
       const tagTerm = filterTag.toLowerCase().trim();
       const matchesTag = !tagTerm
         ? true
         : (post.tags ?? []).some((t) =>
-            t.toLowerCase().includes(tagTerm)
-          );
+          t.toLowerCase().includes(tagTerm)
+        );
 
       // Perfil
       const profileTerm = filterProfile.toLowerCase().trim();
       const matchesProfile = !profileTerm
         ? true
         : (post.profiles ?? []).some((p) =>
-            p.toLowerCase().includes(profileTerm)
-          );
+          p.toLowerCase().includes(profileTerm)
+        );
 
       // Destacar
       const matchesFeatured =
         filterFeatured === "all"
           ? true
           : filterFeatured === "featured"
-          ? !!post.featured
-          : !post.featured;
+            ? !!post.featured
+            : !post.featured;
 
       return (
         matchesSearch &&
@@ -285,9 +286,10 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProper
 
   return (
     <div className="space-y-4 relative z-10">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-2xl font-bold text-foreground">Posts do Blog</h2>
-
+      <PageHeader
+        title="Posts do Blog"
+        description="Gerencie todas as publicações do seu blog em um só lugar."
+      >
         <div className="flex w-full gap-2 sm:w-auto">
           <div className="relative flex-1 sm:w-64">
             <svg
@@ -341,7 +343,7 @@ export const BlogPostList = ({ posts, onEdit, onDelete, onCreate, onUpdateProper
             Novo Post
           </Button>
         </div>
-      </div>
+      </PageHeader>
 
       {filteredPosts.length === 0 ? (
         <Card className="relative z-10">
