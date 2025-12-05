@@ -54,7 +54,7 @@ export const PagesGalleryWidget = () => {
                     <Layout className="h-4 w-4" />
                     Área de Páginas
                 </CardTitle>
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate("/paginas")}>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate("/sites/paginas")}>
                     <MoreVertical className="h-4 w-4" />
                 </Button>
             </CardHeader>
@@ -63,7 +63,7 @@ export const PagesGalleryWidget = () => {
                     {pages.length > 0 ? (
                         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                             {pages.map((page, index) => (
-                                <div key={page.id || index} className="group cursor-pointer" onClick={() => navigate("/paginas")}>
+                                <div key={page.id || index} className="group cursor-pointer" onClick={() => navigate("/sites/paginas")}>
                                     <div className="relative mb-2 aspect-[16/9] overflow-hidden rounded-xl bg-gray-100">
                                         <img
                                             src={getPageImage(page)}
@@ -85,19 +85,6 @@ export const PagesGalleryWidget = () => {
                     )}
 
                     {/* Botão de adicionar páginas */}
-                    <div className="mt-6 flex">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            className="w-full h-12 rounded-xl text-white font-medium border-0 hover:bg-blue-100 transition-colors"
-                            style={{
-                                background: "linear-gradient(90deg, #3363ccff 0%, #2b59ecff 100%)"
-                            }}
-                            onClick={() => navigate("/paginas")}
-                        >
-                            + Adicionar páginas
-                        </Button>
-                    </div>
 
                 </div>
             </CardContent>
