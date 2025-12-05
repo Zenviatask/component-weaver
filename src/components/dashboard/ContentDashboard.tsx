@@ -2,8 +2,7 @@ import { Globe, Rocket, MessageSquare, Activity } from "lucide-react";
 import { DashboardLayout } from "./DashboardLayout";
 import { StatCard } from "./StatCard";
 import { TrafficChart } from "./TrafficChart";
-import WidgetsGrid from './WidgetsGrid';
-import { FunctionalityButtons } from "./FunctionalityButtons";
+import { DashboardWidgetsContainer } from "./DashboardWidgetsContainer";
 import { SitesList } from "./SitesList";
 import { PagesGallery } from "./PagesGallery";
 
@@ -52,10 +51,9 @@ export const ContentDashboard = () => {
           {/* Left Column - 2/3 width */}
           <div className="lg:col-span-2">
             <TrafficChart />
-            
-            <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-              <WidgetsGrid />
-              <FunctionalityButtons />
+
+            <div className="mt-6">
+              <DashboardWidgetsContainer />
             </div>
           </div>
 

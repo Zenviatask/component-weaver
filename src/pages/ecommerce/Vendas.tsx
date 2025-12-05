@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Search, Eye, Package, CheckCircle, Clock, XCircle } from "lucide-react";
+import { Search, Eye, Package, CheckCircle, Clock, XCircle, Users } from "lucide-react";
 
 interface Sale {
   id: string;
@@ -72,6 +72,11 @@ const Vendas = () => {
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
+  const [isCustomersDialogOpen, setIsCustomersDialogOpen] = useState(false);
+
+  const uniqueCustomers = Array.from(
+    new Map(sales.map((sale) => [sale.customerEmail, { name: sale.customerName, email: sale.customerEmail }])).values()
+  );
 
   const filteredSales = sales.filter((sale) => {
     const matchesSearch =
@@ -100,59 +105,92 @@ const Vendas = () => {
     <DashboardLayout>
       <div className="p-4 lg:p-6 relative z-10">
         <PageHeader title="Vendas" description="Acompanhe todas as vendas do seu e-commerce">
-          <Dialog open={isFilterDialogOpen} onOpenChange={setIsFilterDialogOpen}>
-            <DialogTrigger asChild>
-              <FilterButton />
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[480px] bg-white/95 backdrop-blur-md">
-              <DialogHeader>
-                <DialogTitle className="text-slate-800">Filtrar Vendas</DialogTitle>
-              </DialogHeader>
-              <div className="mt-4 space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="search">Buscar</Label>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="search"
-                      placeholder="Buscar por pedido, cliente ou email..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
+          <div className="flex gap-2">
+            <Dialog open={isCustomersDialogOpen} onOpenChange={setIsCustomersDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <Users className="h-4 w-4" />
+                  Clientes
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Clientes Atuais</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+                  {uniqueCustomers.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-4">Nenhum cliente encontrado.</p>
+                  ) : (
+                    uniqueCustomers.map((customer, index) => (
+                      <div key={index} className="flex items-center gap-3 p-3 rounded-lg border bg-slate-50">
+                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
+                          {customer.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="font-medium text-slate-900">{customer.name}</p>
+                          <p className="text-sm text-muted-foreground">{customer.email}</p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={isFilterDialogOpen} onOpenChange={setIsFilterDialogOpen}>
+              <DialogTrigger asChild>
+                <FilterButton />
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[480px] bg-white/95 backdrop-blur-md">
+                <DialogHeader>
+                  <DialogTitle className="text-slate-800">Filtrar Vendas</DialogTitle>
+                </DialogHeader>
+                <div className="mt-4 space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="search">Buscar</Label>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        id="search"
+                        placeholder="Buscar por pedido, cliente ou email..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Status</Label>
+                    <Select value={filterStatus} onValueChange={setFilterStatus}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos status</SelectItem>
+                        <SelectItem value="pending">Pendente</SelectItem>
+                        <SelectItem value="processing">Processando</SelectItem>
+                        <SelectItem value="completed">Concluído</SelectItem>
+                        <SelectItem value="cancelled">Cancelado</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>Status</Label>
-                  <Select value={filterStatus} onValueChange={setFilterStatus}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos status</SelectItem>
-                      <SelectItem value="pending">Pendente</SelectItem>
-                      <SelectItem value="processing">Processando</SelectItem>
-                      <SelectItem value="completed">Concluído</SelectItem>
-                      <SelectItem value="cancelled">Cancelado</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="mt-6 flex justify-between gap-3">
+                  <Button type="button" variant="outline" onClick={clearFilters}>
+                    Limpar filtros
+                  </Button>
+                  <div className="flex gap-2">
+                    <DialogClose asChild>
+                      <Button type="button" variant="outline">Fechar</Button>
+                    </DialogClose>
+                    <DialogClose asChild>
+                      <PrimaryButton>Aplicar</PrimaryButton>
+                    </DialogClose>
+                  </div>
                 </div>
-              </div>
-              <div className="mt-6 flex justify-between gap-3">
-                <Button type="button" variant="outline" onClick={clearFilters}>
-                  Limpar filtros
-                </Button>
-                <div className="flex gap-2">
-                  <DialogClose asChild>
-                    <Button type="button" variant="outline">Fechar</Button>
-                  </DialogClose>
-                  <DialogClose asChild>
-                    <PrimaryButton>Aplicar</PrimaryButton>
-                  </DialogClose>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogContent>
+            </Dialog>
+          </div>
         </PageHeader>
 
         {/* Search and Filter */}
