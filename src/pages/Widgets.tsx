@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/shared";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { ShoppingCart, FileEdit, Image, Zap, Plus, Check } from "lucide-react";
+import { ShoppingCart, FileEdit, Image, Zap, Plus, Check, Globe, BarChart3, Layout } from "lucide-react";
 import { toast } from "sonner";
 
 interface Widget {
@@ -14,6 +14,7 @@ interface Widget {
   icon: React.ElementType;
   color: string;
   enabled: boolean;
+  colSpan?: string;
 }
 
 const availableWidgets = [
@@ -44,6 +45,30 @@ const availableWidgets = [
     description: "Monitore a performance, SEO e uptime do seu site.",
     icon: Zap,
     color: "text-green-600 bg-green-100",
+  },
+  {
+    id: "sites-list",
+    title: "Meus Sites",
+    description: "Lista de sites ativos e seus status.",
+    icon: Globe,
+    color: "text-indigo-600 bg-indigo-100",
+    colSpan: "col-span-1",
+  },
+  {
+    id: "traffic-chart",
+    title: "Tráfego do Site",
+    description: "Gráfico de visualizações e métricas de tráfego.",
+    icon: BarChart3,
+    color: "text-cyan-600 bg-cyan-100",
+    colSpan: "col-span-2",
+  },
+  {
+    id: "pages-gallery",
+    title: "Área de Páginas",
+    description: "Galeria de páginas do site para edição rápida.",
+    icon: Layout,
+    color: "text-orange-600 bg-orange-100",
+    colSpan: "col-span-2",
   },
   {
     id: "quick-access",

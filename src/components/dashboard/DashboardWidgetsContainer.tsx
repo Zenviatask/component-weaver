@@ -4,6 +4,9 @@ import { EditLastPostWidget } from "./widgets/EditLastPostWidget";
 import { GalleryManagerWidget } from "./widgets/GalleryManagerWidget";
 import { QuickAccessWidget } from "./widgets/QuickAccessWidget";
 import { SiteHealthWidget } from "./widgets/SiteHealthWidget";
+import { SitesListWidget } from "./widgets/SitesListWidget";
+import { TrafficChartWidget } from "./widgets/TrafficChartWidget";
+import { PagesGalleryWidget } from "./widgets/PagesGalleryWidget";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -33,8 +36,24 @@ export const DashboardWidgetsContainer = () => {
                 return <QuickAccessWidget />;
             case "site-health":
                 return <SiteHealthWidget />;
+            case "sites-list":
+                return <SitesListWidget />;
+            case "traffic-chart":
+                return <TrafficChartWidget />;
+            case "pages-gallery":
+                return <PagesGalleryWidget />;
             default:
                 return null;
+        }
+    };
+
+    const getColSpan = (id: string) => {
+        switch (id) {
+            case "traffic-chart":
+            case "pages-gallery":
+                return "md:col-span-2";
+            default:
+                return "col-span-1";
         }
     };
 
@@ -58,12 +77,12 @@ export const DashboardWidgetsContainer = () => {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {enabledWidgets.map((id) => (
-                <div key={id} className="h-full min-h-[200px]">
+                <div key={id} className={`h-full min-h-[200px] ${getColSpan(id)}`}>
                     {renderWidget(id)}
                 </div>
             ))}
 
-            <div className="flex items-center justify-center border-2 border-dashed rounded-xl p-4 hover:bg-slate-50 transition-colors cursor-pointer group" onClick={() => navigate("/widgets")}>
+            <div className="flex items-center justify-center border-2 border-dashed rounded-xl p-4 hover:bg-slate-50 transition-colors cursor-pointer group min-h-[200px]" onClick={() => navigate("/widgets")}>
                 <div className="flex flex-col items-center gap-2 text-muted-foreground group-hover:text-blue-600">
                     <Plus className="h-5 w-5" />
                     <span className="text-sm font-medium">Adicionar mais</span>

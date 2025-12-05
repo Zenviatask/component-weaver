@@ -1,10 +1,7 @@
 import { Globe, Rocket, MessageSquare, Activity } from "lucide-react";
 import { DashboardLayout } from "./DashboardLayout";
 import { StatCard } from "./StatCard";
-import { TrafficChart } from "./TrafficChart";
 import { DashboardWidgetsContainer } from "./DashboardWidgetsContainer";
-import { SitesList } from "./SitesList";
-import { PagesGallery } from "./PagesGallery";
 
 export const ContentDashboard = () => {
   return (
@@ -46,26 +43,9 @@ export const ContentDashboard = () => {
           />
         </div>*/}
 
-        {/* Main Content Grid */}
-        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3 ">
-          {/* Left Column - 2/3 width */}
-          <div className="lg:col-span-2">
-            <TrafficChart />
-
-            <div className="mt-6">
-              <DashboardWidgetsContainer />
-            </div>
-          </div>
-
-          {/* Right Column - 1/3 width */}
-          <div>
-            <SitesList />
-          </div>
-        </div>
-
-        {/* Pages Gallery - Full Width */}
+        {/* Main Content */}
         <div className="mt-6">
-          <PagesGallery />
+          <DashboardWidgetsContainer />
         </div>
       </div>
     </DashboardLayout>

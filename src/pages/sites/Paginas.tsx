@@ -1,4 +1,4 @@
-import { useState, ElementType } from "react";
+import { useState, useEffect, ElementType } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,60 +59,74 @@ const defaultSection: Section = {
     cards: [],
     buttonText: "Saiba Mais"
 };
+
 const Paginas = () => {
-    const [pages, setPages] = useState<Page[]>([{
-        id: "1",
-        title: "Home",
-        slug: "/",
-        lastModified: "2024-03-20",
-        sections: [{
-            ...defaultSection,
-            id: "hero",
-            title: "Bem-vindo à Levanta",
-            hasSubtitle: true,
-            subtitle: "Crie seu site conosco",
-            hasButton: true,
-            buttonText: "Começar Agora"
-        }, {
-            ...defaultSection,
-            id: "features",
-            title: "Nossos Serviços",
-            hasCards: true,
-            description: "Confira o que oferecemos",
-            cards: [{
-                id: "c1",
-                title: "Serviço 1",
-                description: "Descrição do serviço 1",
-                imageUrl: "",
-                buttonText: "Ver mais",
-                buttonLink: "#"
+    const [pages, setPages] = useState<Page[]>(() => {
+        const saved = localStorage.getItem("sitePages");
+        if (saved) {
+            return JSON.parse(saved);
+        }
+        return [{
+            id: "1",
+            title: "Home",
+            slug: "/",
+            lastModified: "2024-03-20",
+            sections: [{
+                ...defaultSection,
+                id: "hero",
+                title: "Bem-vindo à Levanta",
+                hasSubtitle: true,
+                subtitle: "Crie seu site conosco",
+                hasButton: true,
+                buttonText: "Começar Agora"
             }, {
-                id: "c2",
-                title: "Serviço 2",
-                description: "Descrição do serviço 2",
-                imageUrl: "",
-                buttonText: "Ver mais",
-                buttonLink: "#"
+                ...defaultSection,
+                id: "features",
+                title: "Nossos Serviços",
+                hasCards: true,
+                description: "Confira o que oferecemos",
+                cards: [{
+                    id: "c1",
+                    title: "Serviço 1",
+                    description: "Descrição do serviço 1",
+                    imageUrl: "",
+                    buttonText: "Ver mais",
+                    buttonLink: "#"
+                }, {
+                    id: "c2",
+                    title: "Serviço 2",
+                    description: "Descrição do serviço 2",
+                    imageUrl: "",
+                    buttonText: "Ver mais",
+                    buttonLink: "#"
+                }]
             }]
-        }]
-    }, {
-        id: "2",
-        title: "Sobre",
-        slug: "/sobre",
-        lastModified: "2024-03-19",
-        sections: [{
-            ...defaultSection,
-            id: "about-main",
-            title: "Nossa História",
-            hasImage: true,
-            description: "Fundada em 2024..."
-        }]
-    }]);
+        }, {
+            id: "2",
+            title: "Sobre",
+            slug: "/sobre",
+            lastModified: "2024-03-19",
+            sections: [{
+                ...defaultSection,
+                id: "about-main",
+                title: "Nossa História",
+                hasImage: true,
+                description: "Fundada em 2024..."
+            }]
+        }];
+    });
+
+    useEffect(() => {
+        localStorage.setItem("sitePages", JSON.stringify(pages));
+    }, [pages]);
+
     const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
     const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
     const selectedPage = pages.find(p => p.id === selectedPageId);
     const currentSection = selectedPage?.sections[currentSectionIndex];
+
     const handleUpdateSection = (updates: Partial<Section>) => {
         if (!selectedPage || !currentSection) return;
         const updatedSections = [...selectedPage.sections];
