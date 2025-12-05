@@ -1,173 +1,112 @@
 import { useState } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { PageHeader, PrimaryButton } from "@/components/shared";
-import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/shared";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    DialogFooter,
-} from "@/components/ui/dialog";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, MoreVertical, Mail, Shield, User, Trash2, Edit } from "lucide-react";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { toast } from "sonner";
+import { Search, Mail, MapPin, ShoppingBag, DollarSign, ShoppingCart } from "lucide-react";
 
-interface UserData {
+interface CustomerData {
     id: string;
     name: string;
     email: string;
-    role: "admin" | "editor" | "viewer";
-    status: "active" | "inactive";
-    avatar?: string;
+    location: string;
+    totalSpent: number;
+    orderCount: number;
+    hasAbandonedCart: boolean;
     lastActive: string;
+    avatar?: string;
+    status: "active" | "inactive";
 }
 
-const initialUsers: UserData[] = [
+const initialCustomers: CustomerData[] = [
     {
         id: "1",
         name: "Ana Silva",
         email: "ana.silva@exemplo.com",
-        role: "admin",
+        location: "São Paulo, SP",
+        totalSpent: 1250.00,
+        orderCount: 5,
+        hasAbandonedCart: true,
+        lastActive: "Há 2 horas",
         status: "active",
         avatar: "https://github.com/shadcn.png",
-        lastActive: "Há 2 minutos",
     },
     {
         id: "2",
         name: "Carlos Santos",
         email: "carlos.santos@exemplo.com",
-        role: "editor",
+        location: "Rio de Janeiro, RJ",
+        totalSpent: 450.50,
+        orderCount: 2,
+        hasAbandonedCart: false,
+        lastActive: "Há 1 dia",
         status: "active",
-        lastActive: "Há 1 hora",
     },
     {
         id: "3",
         name: "Marina Costa",
         email: "marina.costa@exemplo.com",
-        role: "viewer",
+        location: "Belo Horizonte, MG",
+        totalSpent: 3200.00,
+        orderCount: 12,
+        hasAbandonedCart: false,
+        lastActive: "Há 3 dias",
+        status: "active",
+    },
+    {
+        id: "4",
+        name: "Roberto Almeida",
+        email: "roberto.almeida@exemplo.com",
+        location: "Curitiba, PR",
+        totalSpent: 0,
+        orderCount: 0,
+        hasAbandonedCart: true,
+        lastActive: "Há 5 dias",
         status: "inactive",
-        lastActive: "Há 2 dias",
+    },
+    {
+        id: "5",
+        name: "Fernanda Oliveira",
+        email: "fernanda.oliveira@exemplo.com",
+        location: "Porto Alegre, RS",
+        totalSpent: 890.90,
+        orderCount: 3,
+        hasAbandonedCart: true,
+        lastActive: "Há 1 semana",
+        status: "active",
     },
 ];
 
 const Usuarios = () => {
-    const [users, setUsers] = useState<UserData[]>(initialUsers);
+    const [customers] = useState<CustomerData[]>(initialCustomers);
     const [searchTerm, setSearchTerm] = useState("");
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [editingUser, setEditingUser] = useState<UserData | null>(null);
-    const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        role: "viewer",
-        status: "active",
-    });
 
-    const filteredUsers = users.filter(
-        (user) =>
-            user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredCustomers = customers.filter(
+        (customer) =>
+            customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            customer.location.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const handleOpenDialog = (user?: UserData) => {
-        if (user) {
-            setEditingUser(user);
-            setFormData({
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                status: user.status,
-            });
-        } else {
-            setEditingUser(null);
-            setFormData({
-                name: "",
-                email: "",
-                role: "viewer",
-                status: "active",
-            });
-        }
-        setIsDialogOpen(true);
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!formData.name || !formData.email) {
-            toast.error("Preencha todos os campos obrigatórios");
-            return;
-        }
-
-        if (editingUser) {
-            setUsers(users.map((u) => (u.id === editingUser.id ? {
-                ...u,
-                ...formData,
-                role: formData.role as "admin" | "editor" | "viewer",
-                status: formData.status as "active" | "inactive"
-            } : u)));
-            toast.success("Usuário atualizado com sucesso");
-        } else {
-            const newUser: UserData = {
-                id: Date.now().toString(),
-                ...formData,
-                role: formData.role as "admin" | "editor" | "viewer",
-                status: formData.status as "active" | "inactive",
-                lastActive: "Agora",
-            };
-            setUsers([...users, newUser]);
-            toast.success("Usuário criado com sucesso");
-        }
-        setIsDialogOpen(false);
-    };
-
-    const handleDelete = (id: string) => {
-        setUsers(users.filter((u) => u.id !== id));
-        toast.success("Usuário removido com sucesso");
-    };
-
-    const getRoleBadge = (role: string) => {
-        switch (role) {
-            case "admin":
-                return <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200">Admin</Badge>;
-            case "editor":
-                return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">Editor</Badge>;
-            default:
-                return <Badge className="bg-gray-100 text-gray-700 hover:bg-gray-200">Visualizador</Badge>;
-        }
+    const formatCurrency = (value: number) => {
+        return new Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+        }).format(value);
     };
 
     return (
         <DashboardLayout>
             <div className="p-4 lg:p-6 relative z-10">
-                <PageHeader title="Usuários" description="Gerencie o acesso ao sistema">
-                    <PrimaryButton onClick={() => handleOpenDialog()}>
-                        <Plus className="h-4 w-4" />
-                        Novo Usuário
-                    </PrimaryButton>
-                </PageHeader>
+                <PageHeader title="Clientes" description="Acompanhe o comportamento e dados dos seus clientes" />
 
                 <div className="mb-6">
                     <div className="relative max-w-md">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
-                            placeholder="Buscar usuários..."
+                            placeholder="Buscar por nome, email ou cidade..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="pl-10 bg-white"
@@ -176,152 +115,76 @@ const Usuarios = () => {
                 </div>
 
                 <div className="grid gap-4">
-                    {filteredUsers.map((user) => (
-                        <Card key={user.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                    {filteredCustomers.map((customer) => (
+                        <Card key={customer.id} className="overflow-hidden hover:shadow-md transition-shadow">
                             <CardContent className="p-0">
-                                <div className="flex items-center justify-between p-4 sm:p-6">
-                                    <div className="flex items-center gap-4">
-                                        <Avatar className="h-10 w-10 sm:h-12 sm:w-12 border-2 border-white shadow-sm">
-                                            <AvatarImage src={user.avatar} />
+                                <div className="flex flex-col md:flex-row md:items-center justify-between p-4 sm:p-6 gap-4">
+
+                                    {/* User Info */}
+                                    <div className="flex items-center gap-4 min-w-[250px]">
+                                        <Avatar className="h-12 w-12 border-2 border-white shadow-sm">
+                                            <AvatarImage src={customer.avatar} />
                                             <AvatarFallback className="bg-blue-50 text-blue-600 font-medium">
-                                                {user.name.substring(0, 2).toUpperCase()}
+                                                {customer.name.substring(0, 2).toUpperCase()}
                                             </AvatarFallback>
                                         </Avatar>
                                         <div>
-                                            <h3 className="font-semibold text-slate-900">{user.name}</h3>
+                                            <h3 className="font-semibold text-slate-900">{customer.name}</h3>
                                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                                 <Mail className="h-3 w-3" />
-                                                {user.email}
+                                                {customer.email}
+                                            </div>
+                                            <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                                                <MapPin className="h-3 w-3" />
+                                                {customer.location}
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="hidden md:flex items-center gap-6">
-                                        <div className="flex flex-col items-end gap-1">
-                                            {getRoleBadge(user.role)}
-                                            <span className="text-xs text-muted-foreground">
-                                                {user.status === "active" ? (
-                                                    <span className="flex items-center gap-1 text-green-600">
-                                                        <span className="h-1.5 w-1.5 rounded-full bg-green-600" />
-                                                        Ativo
-                                                    </span>
-                                                ) : (
-                                                    <span className="flex items-center gap-1 text-gray-500">
-                                                        <span className="h-1.5 w-1.5 rounded-full bg-gray-400" />
-                                                        Inativo
-                                                    </span>
-                                                )}
+                                    {/* Metrics */}
+                                    <div className="flex flex-wrap items-center gap-6 md:gap-12 flex-1 justify-start md:justify-end">
+
+                                        <div className="flex flex-col items-start md:items-end">
+                                            <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                                <ShoppingBag className="h-3 w-3" />
+                                                Pedidos
                                             </span>
+                                            <span className="font-medium text-slate-900">{customer.orderCount}</span>
                                         </div>
-                                        <div className="text-right text-sm text-muted-foreground">
+
+                                        <div className="flex flex-col items-start md:items-end">
+                                            <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                                <DollarSign className="h-3 w-3" />
+                                                Total Gasto
+                                            </span>
+                                            <span className="font-medium text-slate-900">{formatCurrency(customer.totalSpent)}</span>
+                                        </div>
+
+                                        <div className="flex flex-col items-start md:items-end min-w-[140px]">
+                                            {customer.hasAbandonedCart ? (
+                                                <Badge variant="destructive" className="flex gap-1 items-center bg-orange-100 text-orange-700 hover:bg-orange-200 border-orange-200">
+                                                    <ShoppingCart className="h-3 w-3" />
+                                                    Carrinho Abandonado
+                                                </Badge>
+                                            ) : (
+                                                <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">
+                                                    Sem pendências
+                                                </Badge>
+                                            )}
+                                        </div>
+
+                                        <div className="text-right text-sm text-muted-foreground hidden lg:block min-w-[100px]">
                                             <p className="text-xs">Último acesso</p>
-                                            <p>{user.lastActive}</p>
+                                            <p>{customer.lastActive}</p>
                                         </div>
+
                                     </div>
 
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                <MoreVertical className="h-4 w-4 text-gray-500" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem onClick={() => handleOpenDialog(user)}>
-                                                <Edit className="h-4 w-4 mr-2" />
-                                                Editar
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                                                onClick={() => handleDelete(user.id)}
-                                            >
-                                                <Trash2 className="h-4 w-4 mr-2" />
-                                                Excluir
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
                                 </div>
                             </CardContent>
                         </Card>
                     ))}
                 </div>
-
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>{editingUser ? "Editar Usuário" : "Novo Usuário"}</DialogTitle>
-                        </DialogHeader>
-                        <form onSubmit={handleSubmit} className="space-y-4 py-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="name">Nome</Label>
-                                <div className="relative">
-                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                    <Input
-                                        id="name"
-                                        placeholder="Nome completo"
-                                        value={formData.name}
-                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        className="pl-10"
-                                    />
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="email">Email</Label>
-                                <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                    <Input
-                                        id="email"
-                                        type="email"
-                                        placeholder="email@exemplo.com"
-                                        value={formData.email}
-                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                        className="pl-10"
-                                    />
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="role">Função</Label>
-                                    <Select
-                                        value={formData.role}
-                                        onValueChange={(value) => setFormData({ ...formData, role: value })}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="admin">Administrador</SelectItem>
-                                            <SelectItem value="editor">Editor</SelectItem>
-                                            <SelectItem value="viewer">Visualizador</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="status">Status</Label>
-                                    <Select
-                                        value={formData.status}
-                                        onValueChange={(value) => setFormData({ ...formData, status: value })}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="active">Ativo</SelectItem>
-                                            <SelectItem value="inactive">Inativo</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-                            <DialogFooter>
-                                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                                    Cancelar
-                                </Button>
-                                <PrimaryButton type="submit">
-                                    {editingUser ? "Salvar Alterações" : "Criar Usuário"}
-                                </PrimaryButton>
-                            </DialogFooter>
-                        </form>
-                    </DialogContent>
-                </Dialog>
             </div>
         </DashboardLayout>
     );

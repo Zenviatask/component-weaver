@@ -6,15 +6,18 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 
 const navItems = [
   { title: "Dashboard", icon: LayoutDashboard, url: "/" },
-  { title: "Blog", icon: FileText, url: "/pages" },
   { title: "Widgets", icon: Sparkles, url: "/widgets" },
   { title: "Usuários", icon: Users, url: "/usuarios" },
   { title: "Configurações", icon: Settings, url: "/settings" },
   { title: "Ajuda", icon: HelpCircle, url: "/help" },
 ];
 
-const sitesSubItems = [
+const blogSubItems = [
+  { title: "Posts", icon: FileText, url: "/pages" },
   { title: "Perfis", icon: User, url: "/sites/perfis" },
+];
+
+const sitesSubItems = [
   { title: "Depoimentos", icon: MessageSquare, url: "/sites/depoimentos" },
   { title: "Páginas", icon: FileText, url: "/sites/paginas" },
   { title: "Galeria de imagens", icon: Image, url: "/sites/galeria" },
@@ -29,15 +32,18 @@ const ecommerceSubItems = [
 
 export const DashboardSidebar = () => {
   const location = useLocation();
+  const [blogOpen, setBlogOpen] = useState(false);
   const [sitesOpen, setSitesOpen] = useState(false);
   const [ecommerceOpen, setEcommerceOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
-  const isSitesActive = location.pathname.startsWith("/sites");
+  const isBlogActive = location.pathname === "/pages" || location.pathname === "/sites/perfis";
+  const isSitesActive = location.pathname.startsWith("/sites") && location.pathname !== "/sites/perfis";
   const isEcommerceActive = location.pathname.startsWith("/ecommerce");
 
   const handleMouseLeave = () => {
     setIsHovered(false);
+    setBlogOpen(false);
     setSitesOpen(false);
     setEcommerceOpen(false);
   };
@@ -61,6 +67,41 @@ export const DashboardSidebar = () => {
             Dashboard
           </span>
         </NavLink>
+
+        {/* Blog with submenu */}
+        <Collapsible open={blogOpen} onOpenChange={setBlogOpen} className="mt-1">
+          <CollapsibleTrigger
+            className={`flex h-12 w-full items-center gap-3 rounded-xl px-3 text-gray-400 transition-colors duration-200 hover:bg-white/5 hover:text-white ${isBlogActive ? "bg-blue-500/20 !text-blue-400" : ""
+              }`}
+          >
+            <FileText className="h-5 w-5 shrink-0" />
+            <span className="whitespace-nowrap text-sm font-medium opacity-0 transition-opacity duration-300 group-hover:opacity-100 flex-1 text-left">
+              Blog
+            </span>
+            <ChevronDown className={`h-4 w-4 shrink-0 opacity-0 transition-all duration-300 group-hover:opacity-100 ${blogOpen ? "rotate-180" : ""}`} />
+          </CollapsibleTrigger>
+          <CollapsibleContent className={`overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down ${!isHovered ? 'hidden' : ''}`}>
+            <div className="ml-4 mt-1 space-y-1 border-l border-gray-600 pl-2">
+              {blogSubItems.map((item) => {
+                const isActive = location.pathname === item.url;
+                return (
+                  <NavLink
+                    key={item.title}
+                    to={item.url}
+                    end
+                    className={`flex h-10 items-center gap-3 rounded-xl px-3 text-gray-400 transition-colors duration-200 hover:bg-white/5 hover:text-white ${isActive ? "bg-blue-500/20 !text-blue-400" : ""
+                      }`}
+                  >
+                    <item.icon className="h-4 w-4 shrink-0" />
+                    <span className="whitespace-nowrap text-xs font-medium opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                      {item.title}
+                    </span>
+                  </NavLink>
+                );
+              })}
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
 
         {/* Sites with submenu */}
         <Collapsible open={sitesOpen} onOpenChange={setSitesOpen} className="mt-1">
