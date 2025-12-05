@@ -28,7 +28,8 @@ import {
   Trash2,
   Shield,
   ShoppingCart,
-  FileEdit
+  FileEdit,
+  Server
 } from "lucide-react";
 import { toast } from "sonner";
 import { CategoriesProvider } from "@/contexts/CategoriesContext";
@@ -52,6 +53,12 @@ interface SiteSettings {
   instagram: string;
   twitter: string;
   linkedin: string;
+  serverType: "ssh" | "ftp";
+  serverIp?: string;
+  serverHost?: string;
+  serverUser?: string;
+  serverPassword?: string;
+  serverPort?: string;
 }
 
 interface User {
@@ -84,6 +91,12 @@ const Settings = () => {
     instagram: "",
     twitter: "",
     linkedin: "",
+    serverType: "ssh",
+    serverIp: "",
+    serverHost: "",
+    serverUser: "",
+    serverPassword: "",
+    serverPort: "",
   });
 
   const [users, setUsers] = useState<User[]>([
@@ -464,6 +477,106 @@ const Settings = () => {
                       />
                     </div>
                   </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Servidor */}
+              <AccordionItem value="server" className="border rounded-xl bg-white/80 backdrop-blur-sm px-4 shadow-sm">
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <div className="flex items-center gap-2 text-slate-800">
+                    <Server className="h-5 w-5 text-orange-500" />
+                    <span className="font-semibold">Servidor</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pb-4">
+                  <div className="space-y-2">
+                    <Label>Tipo de Conexão</Label>
+                    <Select
+                      value={settings.serverType}
+                      onValueChange={(value: "ssh" | "ftp") => setSettings({ ...settings, serverType: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ssh">SSH</SelectItem>
+                        <SelectItem value="ftp">FTP</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {settings.serverType === "ssh" ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="serverIp">IP do Servidor</Label>
+                        <Input
+                          id="serverIp"
+                          value={settings.serverIp}
+                          onChange={(e) => setSettings({ ...settings, serverIp: e.target.value })}
+                          placeholder="0.0.0.0"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="serverUser">Usuário</Label>
+                        <Input
+                          id="serverUser"
+                          value={settings.serverUser}
+                          onChange={(e) => setSettings({ ...settings, serverUser: e.target.value })}
+                          placeholder="root"
+                        />
+                      </div>
+                      <div className="space-y-2 md:col-span-2">
+                        <Label htmlFor="serverPassword">Senha</Label>
+                        <Input
+                          id="serverPassword"
+                          type="password"
+                          value={settings.serverPassword}
+                          onChange={(e) => setSettings({ ...settings, serverPassword: e.target.value })}
+                          placeholder="••••••••"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="serverHost">Host</Label>
+                        <Input
+                          id="serverHost"
+                          value={settings.serverHost}
+                          onChange={(e) => setSettings({ ...settings, serverHost: e.target.value })}
+                          placeholder="ftp.exemplo.com"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="serverPort">Porta</Label>
+                        <Input
+                          id="serverPort"
+                          value={settings.serverPort}
+                          onChange={(e) => setSettings({ ...settings, serverPort: e.target.value })}
+                          placeholder="21"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="serverUser">Usuário</Label>
+                        <Input
+                          id="serverUser"
+                          value={settings.serverUser}
+                          onChange={(e) => setSettings({ ...settings, serverUser: e.target.value })}
+                          placeholder="user"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="serverPassword">Senha</Label>
+                        <Input
+                          id="serverPassword"
+                          type="password"
+                          value={settings.serverPassword}
+                          onChange={(e) => setSettings({ ...settings, serverPassword: e.target.value })}
+                          placeholder="••••••••"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
