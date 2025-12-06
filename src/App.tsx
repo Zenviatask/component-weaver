@@ -12,6 +12,7 @@ import Widgets from "./pages/Widgets";
 import Usuarios from "./pages/Usuarios";
 import Settings from "./pages/Settings";
 import Help from "./pages/Help";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import { PostEditorPage } from "./pages/blog/PostEditorPage";
 import Perfis from "./pages/sites/Perfis";
@@ -53,6 +54,7 @@ const App = () => (
                 <Route path="/usuarios" element={<Usuarios />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/help" element={<Help />} />
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/posts/editor" element={<PostEditorPage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />

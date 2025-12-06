@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import DomainDropdown from "@/components/DomainDropdown";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
+import { Link } from "react-router-dom";
+
 export const DashboardHeader = () => {
   return (
     <header className="fixed left-0 right-0 top-0 z-50 flex h-16 items-center justify-between bg-background border-b border-border px-6 shadow-sm">
@@ -24,9 +26,11 @@ export const DashboardHeader = () => {
           <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500" />
         </Button>
 
-        <div className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-2 border-gray-200 bg-gray-50 transition-colors hover:bg-gray-100">
-          <User className="h-5 w-5 text-gray-500" />
-        </div>
+        <Link to="/profile">
+          <div className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-2 border-gray-200 bg-gray-50 transition-colors hover:bg-gray-100">
+            <User className="h-5 w-5 text-gray-500" />
+          </div>
+        </Link>
       </div>
     </header>
   );

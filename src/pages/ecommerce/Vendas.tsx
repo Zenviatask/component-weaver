@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Search, Eye, Package, CheckCircle, Clock, XCircle, Users } from "lucide-react";
+import { SalesOverview } from "@/components/dashboard/ecommerce/SalesOverview";
+import { TopProducts } from "@/components/dashboard/ecommerce/TopProducts";
 
 interface Sale {
   id: string;
@@ -192,6 +194,12 @@ const Vendas = () => {
             </Dialog>
           </div>
         </PageHeader>
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+          <SalesOverview />
+          <TopProducts />
+        </div>
 
         {/* Search and Filter */}
         <GlassCard className="p-4 mb-6">
