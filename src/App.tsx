@@ -13,6 +13,7 @@ import Usuarios from "./pages/Usuarios";
 import Settings from "./pages/Settings";
 import Help from "./pages/Help";
 import Profile from "./pages/Profile";
+import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import { PostEditorPage } from "./pages/blog/PostEditorPage";
 import Perfis from "./pages/sites/Perfis";
@@ -39,6 +40,7 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <Routes>
+                <Route path="/login" element={<Login />} />
                 <Route path="/" element={<Index />} />
                 <Route path="/sites" element={<Sites />} />
                 <Route path="/sites/perfis" element={<Perfis />} />

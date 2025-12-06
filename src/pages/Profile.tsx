@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { PageHeader, ImageUploader } from "@/components/shared";
 import { Input } from "@/components/ui/input";
@@ -18,6 +18,14 @@ const Profile = () => {
         confirmPassword: "",
     });
 
+    useEffect(() => {
+        const savedProfile = localStorage.getItem("userProfile");
+        if (savedProfile) {
+            const parsed = JSON.parse(savedProfile);
+            setFormData(prev => ({ ...prev, ...parsed }));
+        }
+    }, []);
+
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -35,7 +43,17 @@ const Profile = () => {
             return;
         }
 
-        // Simulate API call
+        // Save to localStorage
+        const profileToSave = {
+            name: formData.name,
+            email: formData.email,
+            avatar: formData.avatar
+        };
+        localStorage.setItem("userProfile", JSON.stringify(profileToSave));
+
+        // Dispatch event to update header
+        window.dispatchEvent(new Event("userProfileUpdated"));
+
         console.log("Saving profile:", formData);
         toast.success("Perfil atualizado com sucesso!");
 
@@ -50,7 +68,7 @@ const Profile = () => {
 
     return (
         <DashboardLayout>
-            <div className="p-4 lg:p-6 relative z-10 max-w-4xl mx-auto">
+            <div className="p-4 lg:p-6 relative z-10">
                 <PageHeader title="Meu Perfil" description="Gerencie suas informações pessoais e segurança" />
 
                 <div className="grid gap-6">
